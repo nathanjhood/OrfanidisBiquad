@@ -15,14 +15,20 @@ OrfanidisBiquadAudioProcessorEditor::OrfanidisBiquadAudioProcessorEditor (Orfani
 {
     addAndMakeVisible(gainSlider_);
     gainSlider_.setSliderStyle(juce::Slider::LinearHorizontal);
+    gainSlider_.setTextBoxStyle(juce::Slider::TextEntryBoxPosition(juce::Slider::TextBoxRight), false, 80, 40);
+    gainSlider_.setPopupDisplayEnabled(true, false, nullptr, 20000);
     gainSliderAttachmentPtr.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.apvts, "gain", gainSlider_));
 
     addAndMakeVisible(frequencySlider_);
     frequencySlider_.setSliderStyle(juce::Slider::LinearHorizontal);
+    frequencySlider_.setTextBoxStyle(juce::Slider::TextEntryBoxPosition (juce::Slider::TextBoxRight), false, 80, 40);
+    frequencySlider_.setPopupDisplayEnabled(true, false, nullptr, 20000);
     freqSliderAttachmentPtr.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.apvts, "freq", frequencySlider_));
 
     addAndMakeVisible(bandwidthSlider_);
     bandwidthSlider_.setSliderStyle(juce::Slider::LinearHorizontal);
+    bandwidthSlider_.setTextBoxStyle(juce::Slider::TextEntryBoxPosition (juce::Slider::TextBoxRight), false, 80, 40);
+    bandwidthSlider_.setPopupDisplayEnabled(true, false, nullptr, 20000);
     bandwidthSliderAttachmentPtr.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.apvts, "bandwidth", bandwidthSlider_));
 
     addAndMakeVisible(gainLabel_);
@@ -31,6 +37,7 @@ OrfanidisBiquadAudioProcessorEditor::OrfanidisBiquadAudioProcessorEditor (Orfani
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+    
     const int numRows = p.getNumParameters();
     const int height = numRows * 48 + 24;               // obviously named constants
     setSize(512, height);                              // would be better here!
