@@ -5,6 +5,10 @@
               companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest"
               version="1.0.3">
   <MAINGROUP id="TFytBu" name="OrfanidisBiquad">
+    <GROUP id="{FBE74690-22DE-D413-8178-F49C51EE16C3}" name="Res">
+      <FILE id="asZTR5" name="OrfanidisBiquad.png" compile="0" resource="1"
+            file="Res/OrfanidisBiquad.png"/>
+    </GROUP>
     <GROUP id="{41624350-3ED7-0AD8-E4A9-E9E6C747C1B4}" name="Source">
       <FILE id="mKChb0" name="Convert.cpp" compile="1" resource="0" file="Source/Convert.cpp"/>
       <FILE id="fLgXoG" name="Convert.h" compile="0" resource="0" file="Source/Convert.h"/>
