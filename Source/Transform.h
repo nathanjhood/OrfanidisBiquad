@@ -102,7 +102,6 @@ private:
 
     //==============================================================================
     SampleType b0_ = 1, b1_ = 0, b2_ = 0, a0_ = 1, a1_ = 0, a2_ = 0;
-    SampleType denormal = 1.0e-16;
     dfType transformType = dfType::dfI;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Transformations)

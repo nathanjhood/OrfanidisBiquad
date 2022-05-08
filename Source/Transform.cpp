@@ -79,7 +79,7 @@ SampleType Transformations<SampleType>::processSample(int channel, SampleType in
     jassert(isPositiveAndBelow(channel, Yn_1.size()));
     jassert(isPositiveAndBelow(channel, Yn_1.size()));
 
-    return directFormI(channel, inputValue);   
+    return directFormII(channel, inputValue);   
 }
 
 template <typename SampleType>
@@ -103,9 +103,12 @@ template <typename SampleType>
 SampleType Transformations<SampleType>::directFormII(int channel, SampleType inputValue)
 {
     SampleType Xn = inputValue;
-    juce::ignoreUnused(channel);
 
-    SampleType Yn = ((Xn * b0_) + (Xn * b1_) + (Xn * b2_) + (Xn * a1_) + (Xn * a2_));
+    SampleType Wn = (Xn + ((Yn_1[(size_t)channel] * a1_) + (Yn_2[(size_t)channel] * a2_)));
+    SampleType Yn = ((Wn * b0_) + (Yn_1[(size_t)channel] * b1_) + (Yn_2[(size_t)channel] * b2_));
+
+    Yn_2[(size_t)channel] = Yn_1[(size_t)channel];
+    Yn_1[(size_t)channel] = Wn;
 
     return Yn;
 }
