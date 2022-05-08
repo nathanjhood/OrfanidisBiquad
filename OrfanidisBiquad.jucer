@@ -5,6 +5,8 @@
               companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest">
   <MAINGROUP id="TFytBu" name="OrfanidisBiquad">
     <GROUP id="{41624350-3ED7-0AD8-E4A9-E9E6C747C1B4}" name="Source">
+      <FILE id="mKChb0" name="Convert.cpp" compile="1" resource="0" file="Source/Convert.cpp"/>
+      <FILE id="fLgXoG" name="Convert.h" compile="0" resource="0" file="Source/Convert.h"/>
       <FILE id="HHZnWS" name="PeakFilter.cpp" compile="1" resource="0" file="Source/PeakFilter.cpp"/>
       <FILE id="mT88nx" name="PeakFilter.h" compile="0" resource="0" file="Source/PeakFilter.h"/>
       <FILE id="D6ssIL" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -17,10 +19,8 @@
       <FILE id="AdedAE" name="OrfanidisCalc.h" compile="0" resource="0" file="Source/OrfanidisCalc.h"/>
       <FILE id="LkAASq" name="ParameterSlider.h" compile="0" resource="0"
             file="Source/ParameterSlider.h"/>
-      <FILE id="xZXsCa" name="Transformations.cpp" compile="1" resource="0"
-            file="Source/Transformations.cpp"/>
-      <FILE id="cgnc2P" name="Transformations.h" compile="0" resource="0"
-            file="Source/Transformations.h"/>
+      <FILE id="xZXsCa" name="Transform.cpp" compile="1" resource="0" file="Source/Transform.cpp"/>
+      <FILE id="cgnc2P" name="Transform.h" compile="0" resource="0" file="Source/Transform.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
