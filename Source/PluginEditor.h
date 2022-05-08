@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "ParameterSlider.h"
 
 //==============================================================================
 /**
@@ -26,20 +25,6 @@ public:
     void resized() override;
 
 private:
-
-    juce::Label gainLabel_;
-    juce::Label frequencyLabel_;
-    juce::Label bandwidthLabel_;
-
-    juce::Slider gainSlider_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachmentPtr;
-
-    juce::Slider frequencySlider_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> freqSliderAttachmentPtr;
-
-    juce::Slider bandwidthSlider_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bandwidthSliderAttachmentPtr;
-
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     OrfanidisBiquadAudioProcessor& audioProcessor;
