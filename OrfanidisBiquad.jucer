@@ -2,7 +2,8 @@
 
 <JUCERPROJECT id="EkUu6o" name="OrfanidisBiquad" projectType="audioplug" useAppConfig="1"
               addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
-              companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest">
+              companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest"
+              version="1.0.2">
   <MAINGROUP id="TFytBu" name="OrfanidisBiquad">
     <GROUP id="{41624350-3ED7-0AD8-E4A9-E9E6C747C1B4}" name="Source">
       <FILE id="mKChb0" name="Convert.cpp" compile="1" resource="0" file="Source/Convert.cpp"/>
@@ -17,8 +18,6 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="SMbTvd" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="AdedAE" name="OrfanidisCalc.h" compile="0" resource="0" file="Source/OrfanidisCalc.h"/>
-      <FILE id="LkAASq" name="ParameterSlider.h" compile="0" resource="0"
-            file="Source/ParameterSlider.h"/>
       <FILE id="xZXsCa" name="Transform.cpp" compile="1" resource="0" file="Source/Transform.cpp"/>
       <FILE id="cgnc2P" name="Transform.h" compile="0" resource="0" file="Source/Transform.h"/>
     </GROUP>
