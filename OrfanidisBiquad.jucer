@@ -3,7 +3,7 @@
 <JUCERPROJECT id="EkUu6o" name="OrfanidisBiquad" projectType="audioplug" useAppConfig="1"
               addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
               companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest"
-              version="1.0.2">
+              version="1.0.3">
   <MAINGROUP id="TFytBu" name="OrfanidisBiquad">
     <GROUP id="{41624350-3ED7-0AD8-E4A9-E9E6C747C1B4}" name="Source">
       <FILE id="mKChb0" name="Convert.cpp" compile="1" resource="0" file="Source/Convert.cpp"/>
