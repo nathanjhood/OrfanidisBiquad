@@ -24,6 +24,8 @@ void Transformations<SampleType>::prepare(juce::dsp::ProcessSpec& spec)
 {
     jassert(spec.numChannels > 0);
 
+    Wn_1.resize(spec.numChannels);
+    Wn_2.resize(spec.numChannels);
     Xn_1.resize(spec.numChannels);
     Xn_2.resize(spec.numChannels);
     Yn_1.resize(spec.numChannels);
@@ -37,6 +39,12 @@ void Transformations<SampleType>::prepare(juce::dsp::ProcessSpec& spec)
 template <typename SampleType>
 void Transformations<SampleType>::reset(SampleType initialValue)
 {
+    for (auto& wn_1 : Wn_1)
+        wn_1 = initialValue;
+
+    for (auto& wn_2 : Wn_2)
+        wn_2 = initialValue;
+
     for (auto& xn_1 : Xn_1)
         xn_1 = initialValue;
 
@@ -74,12 +82,19 @@ void Transformations<SampleType>::setTransformType(dfType newTransformType)
 template <typename SampleType>
 SampleType Transformations<SampleType>::processSample(int channel, SampleType inputValue)
 {
+    jassert(isPositiveAndBelow(channel, Wn_1.size()));
+    jassert(isPositiveAndBelow(channel, Wn_2.size()));
     jassert(isPositiveAndBelow(channel, Xn_1.size()));
     jassert(isPositiveAndBelow(channel, Xn_2.size()));
     jassert(isPositiveAndBelow(channel, Yn_1.size()));
     jassert(isPositiveAndBelow(channel, Yn_1.size()));
 
-    return directFormII(channel, inputValue);   
+    if (transformType == TransformationType::dfI)
+        inputValue = directFormI(channel, inputValue);
+    else
+        inputValue = directFormII(channel, inputValue);
+
+    return inputValue;
 }
 
 template <typename SampleType>
@@ -104,11 +119,11 @@ SampleType Transformations<SampleType>::directFormII(int channel, SampleType inp
 {
     SampleType Xn = inputValue;
 
-    SampleType Wn = (Xn + ((Yn_1[(size_t)channel] * a1_) + (Yn_2[(size_t)channel] * a2_)));
-    SampleType Yn = ((Wn * b0_) + (Yn_1[(size_t)channel] * b1_) + (Yn_2[(size_t)channel] * b2_));
+    SampleType Wn = (Xn + ((Wn_1[(size_t)channel] * a1_) + (Wn_2[(size_t)channel] * a2_)));
+    SampleType Yn = ((Wn * b0_) + (Wn_1[(size_t)channel] * b1_) + (Wn_2[(size_t)channel] * b2_));
 
-    Yn_2[(size_t)channel] = Yn_1[(size_t)channel];
-    Yn_1[(size_t)channel] = Wn;
+    Wn_2[(size_t)channel] = Wn_1[(size_t)channel];
+    Wn_1[(size_t)channel] = Wn;
 
     return Yn;
 }
@@ -135,9 +150,26 @@ SampleType Transformations<SampleType>::directFormIITransposed(int channel, Samp
     return Yn;
 }
 
+//template <typename SampleType>
+//SampleType Transformations<SampleType>::directFormIITransposed(int channel, SampleType inputValue)
+//{
+//    SampleType Xn = inputValue;
+//    juce::ignoreUnused(channel);
+//
+//    SampleType Yn = ((Xn * b0_) + (Xn * b1_) + (Xn * b2_) + (Xn * a1_) + (Xn * a2_));
+//
+//    return Yn;
+//}
+
 template <typename SampleType>
 void Transformations<SampleType>::snapToZero() noexcept
 {
+    for (auto& wn_1 : Wn_1)
+        juce::dsp::util::snapToZero(wn_1);
+
+    for (auto& wn_2 : Wn_2)
+        juce::dsp::util::snapToZero(wn_2);
+
     for (auto& xn_1 : Xn_1)
         juce::dsp::util::snapToZero(xn_1);
 
