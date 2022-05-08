@@ -8,8 +8,10 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include "../JuceLibraryCode/JuceHeader.h"
 #include "OrfanidisCalc.h"
+#include "PeakFilter.h"
+#include "Transformations.h"
 
 //==============================================================================
 /**
@@ -22,6 +24,10 @@ public:
     ~OrfanidisBiquadAudioProcessor() override;
 
     //==============================================================================
+    juce::AudioProcessorParameter* getBypassParameter() const;
+    bool supportsDoublePrecisionProcessing() const;
+
+    //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -29,7 +35,11 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
 
-    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    //==============================================================================
+    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlock(juce::AudioBuffer<double>&, juce::MidiBuffer&) override;
+    void processBlockBypassed(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages);
+    void processBlockBypassed(juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages);
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -55,27 +65,43 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    using APVTS = juce::AudioProcessorValueTreeState;
-    static APVTS::ParameterLayout createParameterLayout();
-    APVTS apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+    juce::AudioProcessorValueTreeState& getAPVTS();
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
 private:
-    //==============================================================================
 
-    juce::AudioParameterFloat* gain;      // managedParameters owns
+    //==============================================================================
+    /** Updates the internal state variables of the processor. */
+    void update();
+
+    //==============================================================================
+    juce::AudioParameterFloat* gain;
     juce::AudioParameterFloat* frequency;
     juce::AudioParameterFloat* bandwidth;
 
-    OrfanidisCalc coeffs;
+    juce::dsp::ProcessSpec spec;
 
-    std::vector<double> xn_1; // state for up to 8 chans
+    OrfanidisCalc coeffs;
+    PeakFilter<float> peakFilter;
+    Transformations<float> transform;
+
+    std::vector<double> xn_1;
     std::vector<double> xn_2;
     std::vector<double> yn_1;
     std::vector<double> yn_2;
 
-    double denormal{ 1.0e-16 };  // use to keep mantissa from dropping below 1.xxx
-                               // see http://www.earlevel.com/main/2012/12/03/a-note-about-de-normalization/
-                               // also see Falco's DspFilters MathSupplement.h re: 1e-8?
+    //==============================================================================
+    /** Parameter pointers. */
+    juce::AudioParameterBool* bypPtr{ nullptr };
+    juce::AudioParameterFloat* gainPtr{ nullptr };
+    juce::AudioParameterFloat* freqPtr{ nullptr };
+    juce::AudioParameterFloat* bandPtr{ nullptr };
+
+    //==============================================================================
+    /** Init variables. */
+    double denormal{ 1.0e-16 };
+    double ramp = 0.0001;
 
 
 
