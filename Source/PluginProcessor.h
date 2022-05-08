@@ -10,6 +10,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "OrfanidisCalc.h"
+#include "Convert.h"
 #include "PeakFilter.h"
 #include "Transform.h"
 
@@ -83,9 +84,10 @@ private:
 
     juce::dsp::ProcessSpec spec;
 
-    OrfanidisCalc coeffs;
-    PeakFilter<float> peakFilter;
+    OrfanidisCalc<float> coeffs;
+    Conversion<float> convert;
     Transformations<float> transform;
+    PeakFilter<float> peakFilter;
 
     //std::vector<double> xn_1;
     //std::vector<double> xn_2;

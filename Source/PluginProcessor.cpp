@@ -144,7 +144,7 @@ void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int sample
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumOutputChannels();
 
-    coeffs.setRate(sampleRate);
+    //coeffs.setRate(sampleRate);
     peakFilter.prepare(spec);
     transform.prepare(spec);
 }
@@ -158,7 +158,11 @@ void OrfanidisBiquadAudioProcessor::update()
 {
     bypPtr->get();
 
-    coeffs.calculate(*gainPtr, *freqPtr, *bandPtr);
+    convert.calculate(gainPtr->get(), freqPtr->get(), bandPtr->get());
+
+    //coeffs.calculate(*gainPtr, *freqPtr, *bandPtr);
+
+    coeffs.calculateCoefficients(1.0f, convert.getG(), convert.getGB(), convert.getw0(), convert.getDw());
 
     transform.coefficients(coeffs.b0(), coeffs.b1(), coeffs.b2(), coeffs.a0(), coeffs.a1(), coeffs.a2());
 
