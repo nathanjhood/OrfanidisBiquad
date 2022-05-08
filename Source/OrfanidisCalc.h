@@ -3,7 +3,7 @@
 
     OrfanidisCalc.h
     Created: 22 Jun 2016 3:54:00pm
-    Author:  John Flynn
+    Author:  John Flynn / StoneyDSP
 
   ==============================================================================
 */
@@ -11,8 +11,88 @@
 #ifndef ORFANIDISCALC_H_INCLUDED
 #define ORFANIDISCALC_H_INCLUDED
 
-#include <cmath>
-#include <JuceHeader.h>
+#include "../JuceLibraryCode/JuceHeader.h"
+
+
+template <typename SampleType>
+class OrfanidisCalc
+{
+public:
+    //==============================================================================
+    OrfanidisCalc() {};
+
+    SampleType b0() { return b0_; };
+    SampleType b1() { return b1_; };
+    SampleType b2() { return b2_; };
+    SampleType a0() { return 1.0; };
+    SampleType a1() { return a1_; };
+    SampleType a2() { return a2_; };
+
+
+
+    //==============================================================================
+    void calculateCoefficients (SampleType G0, SampleType G, SampleType GB, SampleType w0, SampleType Dw)
+    {
+        if (G == GB)    // if no boost or cut, pass audio
+        {
+            b0_ = SampleType(1.0);
+            b1_ = SampleType(0.0);
+            b2_ = SampleType(0.0);
+            a0_ = SampleType(1.0);
+            a1_ = SampleType(0.0);
+            a2_ = SampleType(0.0);
+        }
+        else            // else calculate coefficients
+        {
+            const SampleType F   = std::abs (G*G   - GB*GB);
+            const SampleType G00 = std::abs (G*G   - G0*G0);
+            const SampleType F00 = std::abs (GB*GB - G0*G0);
+
+            const SampleType num = G0*G0 * std::pow (w0*w0 - pi*pi, SampleType(2.0)) + G*G * F00 * pi*pi * Dw*Dw / F;
+            const SampleType den = std::pow (w0*w0 - pi*pi, SampleType(2.0)) + F00 * pi*pi * Dw*Dw / F;
+
+            const SampleType G1  = std::sqrt (num/den);
+
+            const SampleType G01 = std::abs (G*G  - G0*G1);
+            const SampleType G11 = std::abs (G*G  - G1*G1);
+            const SampleType F01 = std::abs (GB*GB - G0*G1);
+            const SampleType F11 = std::abs (GB*GB - G1*G1);
+
+            const SampleType W2 = std::sqrt (G11 / G00) * std::pow (std::tan (w0/ SampleType(2.0)), SampleType(2.0));
+            const SampleType DW = (SampleType(1.0) + std::sqrt (F00 / F11) * W2) * std::tan (Dw/ SampleType(2.0));
+
+            const SampleType C = F11 * DW*DW - SampleType(2.0) * W2 * (F01 - std::sqrt (F00 * F11));
+            const SampleType D = SampleType(2.0) * W2 * (G01 - std::sqrt (G00 * G11));
+
+            const SampleType A = std::sqrt ((C + D) / F);
+            const SampleType B = std::sqrt ((G*G * C + GB*GB * D) / F);
+
+            b0_ = (G1 + G0*W2 + B) / (SampleType(1.0) + W2 + A);
+            b1_ = SampleType(-2.0) * ((G1 - G0*W2) / (SampleType(1.0) + W2 + A));
+            b2_ = (G1 - B + G0*W2) / (SampleType(1.0) + W2 + A);
+            a1_ = SampleType(-2.0) * ((1 - W2) / (SampleType(1.0) + W2 + A)),
+            a2_ = (SampleType(1.0) + W2 - A) / (SampleType(1.0) + W2 + A);
+        }
+    }
+
+private:
+    SampleType b0_{ 0.0 };
+    SampleType b1_{ 0.0 };
+    SampleType b2_{ 0.0 };
+    SampleType a0_{ 0.0 };
+    SampleType a1_{ 0.0 };
+    SampleType a2_{ 0.0 };
+    
+    const SampleType pi = juce::MathConstants<SampleType>::pi;
+    const SampleType root2 = std::sqrt(SampleType(2.0));
+
+};
+
+#endif  // ORFANIDISCALC_H_INCLUDED
+
+template class OrfanidisCalc<float>;
+template class OrfanidisCalc<double>;
+
 
 
 //==============================================================================
@@ -22,7 +102,7 @@
     OrfanidisCalc c;
     c.calculateCoefficients (1, 2, 1.75, 0.25*pi, 0.4*pi);
     cout << c.b0() << c.b1() << c.b2() << c.a0() << c.a1() << c.a2() << endl;
-    
+
     ---
 
     From the matlab/octave code...
@@ -71,114 +151,64 @@
     b = [(G1 + G0*W2 + B), -2*(G1 - G0*W2), (G1 - B + G0*W2)] / (1 + W2 + A);
     a = [1, [-2*(1 - W2), (1 + W2 - A)] / (1 + W2 + A)];
 */
-class OrfanidisCalc
-{
-public:
-    //==============================================================================
-    OrfanidisCalc() {}
 
-    double b0() { return b0_; };
-    double b1() { return b1_; };
-    double b2() { return b2_; };
-    double a0() { return 1.0; };
-    double a1() { return a1_; };
-    double a2() { return a2_; };
 
-    void setRate (double newSampleRate)
-    {
-        jassert (newSampleRate > 0);
-        samplerate = newSampleRate;
-    }
 
-    double linToHz (double lin)
-    {
-        //jassert (0 <= lin && lin <= 1);
-        //return 20 * std::pow (10, 3 * lin); // 3 decades in freq scale
-        return lin;
-    }
-
-    double hzToRadPerSamp (double hz)
-    {
-        jassert (0 <= hz && hz <= (samplerate / 2));
-        return hz * ((2 * pi) / samplerate);
-    }
-
-    void calculate (double gain, double frequency, double q)
-    {
-        const double gainLin  = juce::Decibels::decibelsToGain (gain);
-        const double bandwidthGain = juce::Decibels::decibelsToGain (gain / root2);
-        const double hzFrequency = linToHz (frequency);
-        const double radSampFrequency = hzToRadPerSamp (hzFrequency);
-        const double radSampBandwidth = radSampFrequency / (1.588308819 * q); // q scaling factor 1.58...
-/*
-        String str;
-        str << "gainLin          " << gainLin << "\n"                                 // debug
-            << "bandwidthGain    " << bandwidthGain << "\n"
-            << "hzFrequency      " << hzFrequency << "\n"
-            << "radSampFrequency " << radSampFrequency << "\n"
-            << "radSampBandwidth " << radSampBandwidth << "\n";
-        Logger::outputDebugString (str);
-*/
-        calculateCoefficients (1, gainLin, bandwidthGain, radSampFrequency, radSampBandwidth);
-    }
 
     //==============================================================================
-    void calculateCoefficients (double G0, double G, double GB, double w0, double Dw)
-    {
-        if (G == GB)    // if no boost or cut, pass audio
-        {
-            b0_ = 1;
-            b1_ = 0;
-            b2_ = 0;
-            a1_ = 0;
-            a2_ = 0;
-        }
-        else            // else calculate coefficients
-        {
-            const double F   = std::abs (G*G   - GB*GB);
-            const double G00 = std::abs (G*G   - G0*G0);
-            const double F00 = std::abs (GB*GB - G0*G0);
-
-            const double num = G0*G0 * std::pow (w0*w0 - pi*pi, 2) + G*G * F00 * pi*pi * Dw*Dw / F;
-            const double den = std::pow (w0*w0 - pi*pi, 2) + F00 * pi*pi * Dw*Dw / F;
-
-            const double G1  = std::sqrt (num/den);
-
-            const double G01 = std::abs (G*G  - G0*G1);
-            const double G11 = std::abs (G*G  - G1*G1);
-            const double F01 = std::abs (GB*GB - G0*G1);
-            const double F11 = std::abs (GB*GB - G1*G1);
-
-            const double W2 = std::sqrt (G11 / G00) * std::pow (std::tan (w0/2), 2);
-            const double DW = (1 + std::sqrt (F00 / F11) * W2) * std::tan (Dw/2);
-
-            const double C = F11 * DW*DW - 2 * W2 * (F01 - std::sqrt (F00 * F11));
-            const double D = 2 * W2 * (G01 - std::sqrt (G00 * G11));
-
-            const double A = std::sqrt ((C + D) / F);
-            const double B = std::sqrt ((G*G * C + GB*GB * D) / F);
-
-            b0_ = (G1 + G0*W2 + B) / (1 + W2 + A);
-            b1_ = -2 * ((G1 - G0*W2) / (1 + W2 + A));
-            b2_ = (G1 - B + G0*W2) / (1 + W2 + A);
-            a1_ = -2 * ((1 - W2) / (1 + W2 + A)),
-            a2_ = (1 + W2 - A) / (1 + W2 + A);
-        }
-    }
-
-private:
-    double b0_ {0};  // filter transfer function coefficients
-    double b1_ {0};
-    double b2_ {0};
-    double a1_ {0};
-    double a2_ {0};
-
-    double samplerate {0};
-    
-    const double pi    {3.141592653589793115997963468544185161590576171875};
-    const double root2 {1.4142135623730951454746218587388284504413604736328125};
-
-};
-
-
-#endif  // ORFANIDISCALC_H_INCLUDED
+//    void calculateCoefficients(double G0, double G, double GB, double w0, double Dw)
+//    {
+//        if (G == GB)    // if no boost or cut, pass audio
+//        {
+//            b0_ = 1;
+//            b1_ = 0;
+//            b2_ = 0;
+//            a1_ = 0;
+//            a2_ = 0;
+//        }
+//        else            // else calculate coefficients
+//        {
+//            const double F = std::abs(G * G - GB * GB);
+//            const double G00 = std::abs(G * G - G0 * G0);
+//            const double F00 = std::abs(GB * GB - G0 * G0);
+//
+//            const double num = G0 * G0 * std::pow(w0 * w0 - pi * pi, 2) + G * G * F00 * pi * pi * Dw * Dw / F;
+//            const double den = std::pow(w0 * w0 - pi * pi, 2) + F00 * pi * pi * Dw * Dw / F;
+//
+//            const double G1 = std::sqrt(num / den);
+//
+//            const double G01 = std::abs(G * G - G0 * G1);
+//            const double G11 = std::abs(G * G - G1 * G1);
+//            const double F01 = std::abs(GB * GB - G0 * G1);
+//            const double F11 = std::abs(GB * GB - G1 * G1);
+//
+//            const double W2 = std::sqrt(G11 / G00) * std::pow(std::tan(w0 / 2), 2);
+//            const double DW = (1 + std::sqrt(F00 / F11) * W2) * std::tan(Dw / 2);
+//
+//            const double C = F11 * DW * DW - 2 * W2 * (F01 - std::sqrt(F00 * F11));
+//            const double D = 2 * W2 * (G01 - std::sqrt(G00 * G11));
+//
+//            const double A = std::sqrt((C + D) / F);
+//            const double B = std::sqrt((G * G * C + GB * GB * D) / F);
+//
+//            b0_ = (G1 + G0 * W2 + B) / (1 + W2 + A);
+//            b1_ = -2 * ((G1 - G0 * W2) / (1 + W2 + A));
+//            b2_ = (G1 - B + G0 * W2) / (1 + W2 + A);
+//            a1_ = -2 * ((1 - W2) / (1 + W2 + A)),
+//                a2_ = (1 + W2 - A) / (1 + W2 + A);
+//        }
+//    }
+//
+//private:
+//    double b0_{ 0 };  // filter transfer function coefficients
+//    double b1_{ 0 };
+//    double b2_{ 0 };
+//    double a1_{ 0 };
+//    double a2_{ 0 };
+//
+//    double samplerate{ 0 };
+//
+//    const double pi{ 3.141592653589793115997963468544185161590576171875 };
+//    const double root2{ 1.4142135623730951454746218587388284504413604736328125 };
+//
+//
