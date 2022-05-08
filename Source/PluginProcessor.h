@@ -11,7 +11,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "OrfanidisCalc.h"
 #include "PeakFilter.h"
-#include "Transformations.h"
+#include "Transform.h"
 
 //==============================================================================
 /**

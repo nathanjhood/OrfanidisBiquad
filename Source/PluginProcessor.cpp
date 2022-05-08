@@ -164,7 +164,7 @@ void OrfanidisBiquadAudioProcessor::update()
     bypPtr->get();
     coeffs.calculate(*gainPtr, *freqPtr, *bandPtr);
     transform.setTransformType(TransformationType::dfI);
-    transform.coefficients(coeffs.b0(), coeffs.b1(), coeffs.b2(), coeffs.a0(), coeffs.b1(), coeffs.a2());
+    transform.coefficients(coeffs.b0(), coeffs.b1(), coeffs.b2(), coeffs.a0(), coeffs.a1(), coeffs.a2());
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -231,8 +231,6 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
         // audio processing...
 
         update();
-
-        coeffs.calculate(*gain, *frequency, *bandwidth);
 
         //const double b0 = coeffs.b0();
         //const double b1 = coeffs.b1();
