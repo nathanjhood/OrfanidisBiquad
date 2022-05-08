@@ -79,6 +79,7 @@ private:
     juce::AudioParameterFloat* gain;
     juce::AudioParameterFloat* frequency;
     juce::AudioParameterFloat* bandwidth;
+    juce::AudioParameterChoice* type;
 
     juce::dsp::ProcessSpec spec;
 
@@ -97,6 +98,7 @@ private:
     juce::AudioParameterFloat* gainPtr{ nullptr };
     juce::AudioParameterFloat* freqPtr{ nullptr };
     juce::AudioParameterFloat* bandPtr{ nullptr };
+    juce::AudioParameterChoice* typePtr{ nullptr };
 
     //==============================================================================
     /** Init variables. */

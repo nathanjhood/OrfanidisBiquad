@@ -7,7 +7,7 @@
 */
 
 #include "PluginProcessor.h"
-//#include "PluginEditor.h"
+#include "PluginEditor.h"
 
 //==============================================================================
 OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
@@ -28,13 +28,11 @@ OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
     freqPtr = dynamic_cast      <juce::AudioParameterFloat*>    (apvts.getParameter("freqID"));
     jassert(freqPtr != nullptr);
 
-    bandPtr = dynamic_cast  <juce::AudioParameterFloat*>        (apvts.getParameter("bandID"));
+    bandPtr = dynamic_cast      <juce::AudioParameterFloat*>    (apvts.getParameter("bandID"));
     jassert(bandPtr != nullptr);
 
-    /*xn_1.resize(8, 0);
-    xn_2.resize(8, 0);
-    yn_1.resize(8, 0);
-    yn_2.resize(8, 0);*/
+    typePtr = dynamic_cast      <juce::AudioParameterChoice*>   (apvts.getParameter("typeID"));
+    jassert(typePtr != nullptr);
 }
 
 OrfanidisBiquadAudioProcessor::~OrfanidisBiquadAudioProcessor()
@@ -57,6 +55,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout OrfanidisBiquadAudioProcesso
     params.push_back(std::make_unique<juce::AudioParameterFloat>("freqID", "Freq", freqRange, 632.45f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("gainID", "Gain", gainRange, 00.00f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("bandID", "Bandwidth", 00.10f, 01.00f, 00.10f));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("typeID", "Type", juce::StringArray({ "DFI", "DFII"}), 1));
     
     return { params.begin(), params.end() };
 }
@@ -145,11 +144,6 @@ void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int sample
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumOutputChannels();
 
-    /*xn_1.assign(8, 0);
-    xn_2.assign(8, 0);
-    yn_1.assign(8, 0);
-    yn_2.assign(8, 0);*/
-
     coeffs.setRate(sampleRate);
     peakFilter.prepare(spec);
     transform.prepare(spec);
@@ -157,14 +151,21 @@ void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int sample
 
 void OrfanidisBiquadAudioProcessor::releaseResources()
 {
+    transform.reset(0);
 }
 
 void OrfanidisBiquadAudioProcessor::update()
 {
     bypPtr->get();
+
     coeffs.calculate(*gainPtr, *freqPtr, *bandPtr);
-    transform.setTransformType(TransformationType::dfI);
+
     transform.coefficients(coeffs.b0(), coeffs.b1(), coeffs.b2(), coeffs.a0(), coeffs.a1(), coeffs.a2());
+
+    if (typePtr->getIndex() == 0)
+        transform.setTransformType(TransformationType::dfI);
+    else
+        transform.setTransformType(TransformationType::dfII);
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -221,42 +222,10 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
     if (bypPtr->get() == false)
 
     {
+        juce::ignoreUnused(buffer);
         juce::ignoreUnused(midiMessages);
 
         juce::ScopedNoDenormals noDenormals;
-        //auto totalNumInputChannels = getTotalNumInputChannels();
-
-
-        // This is the place where you'd normally do the guts of your plugin's
-        // audio processing...
-
-        update();
-
-        //const double b0 = coeffs.b0();
-        //const double b1 = coeffs.b1();
-        //const double b2 = coeffs.b2();
-        //const double a1 = coeffs.a1();
-        //const double a2 = coeffs.a2();
-
-        //double** yn = buffer.getArrayOfWritePointers();
-
-        //for (int s = 0; s < buffer.getNumSamples(); ++s)
-        //{
-        //    for (int c = 0; c < totalNumInputChannels; ++c)
-        //    {
-
-        //        const double xn = static_cast<double> (yn[c][s]); // perform calcs at double
-
-        //                                      // direct form 1
-        //        yn[c][s] = static_cast<float> (b0 * xn + b1 * xn_1[c] + b2 * xn_2[c]
-        //            - a1 * yn_1[c] - a2 * yn_2[c]);
-
-        //        xn_2[c] = xn_1[c];  // advance delay networks
-        //        xn_1[c] = xn;
-        //        yn_2[c] = yn_1[c];
-        //        yn_1[c] = yn[c][s];
-        //    }
-        //}
     }
 
     else
