@@ -8,4 +8,6 @@ Audio EQ Peak Band with no digital "cramping", and selectable transformations (D
 Reference: Original paper (including MATLAB code) "Digital Parametric Equalizer Design With Prescribed
 Nyquist-Frequency Gain", Sophocles J. Orfanidis, 1996; https://www.ece.rutgers.edu/~orfanidi/ece348/peq.pdf
 
+![Direct Form I](Res/496px-Digital_Biquad_Direct_Form_1_Untransformed.svg.png)
+
 Reference: Transformations taken from: https://en.wikipedia.org/wiki/Digital_biquad_filter
