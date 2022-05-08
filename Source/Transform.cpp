@@ -91,8 +91,12 @@ SampleType Transformations<SampleType>::processSample(int channel, SampleType in
 
     if (transformType == TransformationType::dfI)
         inputValue = directFormI(channel, inputValue);
-    else
+    else if (transformType == TransformationType::dfII)
         inputValue = directFormII(channel, inputValue);
+    else if (transformType == TransformationType::dfIt)
+        inputValue = directFormITransposed(channel, inputValue);
+    else if (transformType == TransformationType::dfIIt)
+        inputValue = directFormIITransposed(channel, inputValue);
 
     return inputValue;
 }
@@ -132,9 +136,14 @@ template <typename SampleType>
 SampleType Transformations<SampleType>::directFormITransposed(int channel, SampleType inputValue)
 {
     SampleType Xn = inputValue;
-    juce::ignoreUnused(channel);
+    SampleType Wn = (Xn + Wn_2[(size_t)channel]);
+    SampleType Yn = ((Wn * b0_) + Xn_2[(size_t)channel]);
 
-    SampleType Yn = ((Xn * b0_) + (Xn * b1_) + (Xn * b2_) + (Xn * a1_) + (Xn * a2_));
+    Xn_2[(size_t)channel] = ((Wn * b1_) + Xn_1[(size_t)channel]);
+    Xn_1[(size_t)channel] = (Wn * b2_);
+
+    Wn_2[(size_t)channel] = ((Wn * a1_) + Wn_1[(size_t)channel]);
+    Wn_1[(size_t)channel] = (Wn * a2_);
 
     return Yn;
 }
@@ -143,9 +152,11 @@ template <typename SampleType>
 SampleType Transformations<SampleType>::directFormIITransposed(int channel, SampleType inputValue)
 {
     SampleType Xn = inputValue;
-    juce::ignoreUnused(channel);
 
-    SampleType Yn = ((Xn * b0_) + (Xn * b1_) + (Xn * b2_) + (Xn * a1_) + (Xn * a2_));
+    SampleType Yn = ((Xn * b0_) + (Xn_2[(size_t)channel]));
+
+    Xn_2[(size_t)channel] = ((Xn * b1_) + (Xn_1[(size_t)channel]) + (Yn * a1_));
+    Xn_1[(size_t)channel] = ((Xn * b2_) + (Yn * a2_));
 
     return Yn;
 }
