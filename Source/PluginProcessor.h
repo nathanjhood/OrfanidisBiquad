@@ -86,10 +86,10 @@ private:
     PeakFilter<float> peakFilter;
     Transformations<float> transform;
 
-    std::vector<double> xn_1;
-    std::vector<double> xn_2;
-    std::vector<double> yn_1;
-    std::vector<double> yn_2;
+    //std::vector<double> xn_1;
+    //std::vector<double> xn_2;
+    //std::vector<double> yn_1;
+    //std::vector<double> yn_2;
 
     //==============================================================================
     /** Parameter pointers. */
@@ -100,7 +100,7 @@ private:
 
     //==============================================================================
     /** Init variables. */
-    double denormal{ 1.0e-16 };
+
     double ramp = 0.0001;
 
 
