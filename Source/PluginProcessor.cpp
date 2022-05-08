@@ -19,6 +19,9 @@ OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
 #endif
 
 {
+    bitsPtr = dynamic_cast       <juce::AudioParameterBool*>    (apvts.getParameter("bitsID"));
+    jassert(bitsPtr != nullptr);
+
     bypPtr = dynamic_cast       <juce::AudioParameterBool*>    (apvts.getParameter("bypassID"));
     jassert(bypPtr != nullptr);
 
@@ -31,8 +34,8 @@ OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
     bandPtr = dynamic_cast      <juce::AudioParameterFloat*>    (apvts.getParameter("bandID"));
     jassert(bandPtr != nullptr);
 
-    typePtr = dynamic_cast      <juce::AudioParameterChoice*>   (apvts.getParameter("typeID"));
-    jassert(typePtr != nullptr);
+    transPtr = dynamic_cast      <juce::AudioParameterChoice*>   (apvts.getParameter("transID"));
+    jassert(transPtr != nullptr);
 }
 
 OrfanidisBiquadAudioProcessor::~OrfanidisBiquadAudioProcessor()
@@ -50,12 +53,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout OrfanidisBiquadAudioProcesso
 
     auto freqRange = juce::NormalisableRange<float>(20.00f, 20000.00f, 0.01f, 00.198894f);
     auto gainRange = juce::NormalisableRange<float>(-30.00f, 30.00f, 0.01f, 1.00f);
+    auto tString = juce::StringArray({ "Direct Form I", "Direct Form II", "Direct Form I (t)", "Direct Form II (t)" });
 
+    params.push_back(std::make_unique<juce::AudioParameterBool>("bitsID", "Bits", false));
     params.push_back(std::make_unique<juce::AudioParameterBool>("bypassID", "Bypass", false));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("freqID", "Freq", freqRange, 632.45f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("gainID", "Gain", gainRange, 00.00f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("bandID", "Bandwidth", 00.10f, 01.00f, 00.10f));
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("typeID", "Type", juce::StringArray({ "DFI", "DFII"}), 1));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("transID", "Transform", tString, 3));
     
     return { params.begin(), params.end() };
 }
@@ -139,37 +144,41 @@ void OrfanidisBiquadAudioProcessor::changeProgramName (int index, const juce::St
 //==============================================================================
 void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumOutputChannels();
 
-    //coeffs.setRate(sampleRate);
-    peakFilter.prepare(spec);
+    //peakFilter.prepare(spec);
     transform.prepare(spec);
 }
 
 void OrfanidisBiquadAudioProcessor::releaseResources()
 {
-    transform.reset(0);
+    transform.reset(float (0.0));
 }
 
 void OrfanidisBiquadAudioProcessor::update()
 {
     bypPtr->get();
+    bitsPtr->get();
+
+
 
     convert.calculate(gainPtr->get(), freqPtr->get(), bandPtr->get());
 
-    //coeffs.calculate(*gainPtr, *freqPtr, *bandPtr);
-
-    coeffs.calculateCoefficients(1.0f, convert.getG(), convert.getGB(), convert.getw0(), convert.getDw());
+    coeffs.calculateCoefficients(float (1.0), convert.getG(), convert.getGB(), convert.getw0(), convert.getDw());
 
     transform.coefficients(coeffs.b0(), coeffs.b1(), coeffs.b2(), coeffs.a0(), coeffs.a1(), coeffs.a2());
 
-    if (typePtr->getIndex() == 0)
+    if (transPtr->getIndex() == 0)
         transform.setTransformType(TransformationType::dfI);
-    else
+    else if (transPtr->getIndex() == 1)
         transform.setTransformType(TransformationType::dfII);
+    else if (transPtr->getIndex() == 2)
+        transform.setTransformType(TransformationType::dfIt);
+    else if (transPtr->getIndex() == 3)
+        transform.setTransformType(TransformationType::dfIIt);
+
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -182,9 +191,6 @@ bool OrfanidisBiquadAudioProcessor::isBusesLayoutSupported (const BusesLayout& l
 
     if (layouts.getMainInputChannelSet() == juce::AudioChannelSet::disabled()
     || layouts.getMainOutputChannelSet() == juce::AudioChannelSet::disabled())
-
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
    #if ! JucePlugin_IsSynth
@@ -226,10 +232,17 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
     if (bypPtr->get() == false)
 
     {
-        juce::ignoreUnused(buffer);
         juce::ignoreUnused(midiMessages);
 
         juce::ScopedNoDenormals noDenormals;
+
+        update();
+
+        //auto block = juce::dsp::AudioBlock<double>(buffer);
+
+        //auto context = juce::dsp::ProcessContextReplacing(block);
+
+        //transform.process(context);
     }
 
     else

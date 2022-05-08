@@ -87,20 +87,15 @@ private:
     OrfanidisCalc<float> coeffs;
     Conversion<float> convert;
     Transformations<float> transform;
-    PeakFilter<float> peakFilter;
-
-    //std::vector<double> xn_1;
-    //std::vector<double> xn_2;
-    //std::vector<double> yn_1;
-    //std::vector<double> yn_2;
 
     //==============================================================================
     /** Parameter pointers. */
+    juce::AudioParameterBool* bitsPtr{ nullptr };
     juce::AudioParameterBool* bypPtr{ nullptr };
     juce::AudioParameterFloat* gainPtr{ nullptr };
     juce::AudioParameterFloat* freqPtr{ nullptr };
     juce::AudioParameterFloat* bandPtr{ nullptr };
-    juce::AudioParameterChoice* typePtr{ nullptr };
+    juce::AudioParameterChoice* transPtr{ nullptr };
 
     //==============================================================================
     /** Init variables. */
