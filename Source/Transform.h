@@ -101,7 +101,7 @@ private:
     std::vector<SampleType> Wn_1, Wn_2, Xn_1, Xn_2, Yn_1, Yn_2;
 
     //==============================================================================
-    SampleType b0_ = 1, b1_ = 0, b2_ = 0, a0_ = 1, a1_ = 0, a2_ = 0;
+    SampleType b0_ = 1.0, b1_ = 0.0, b2_ = 0.0, a0_ = 1.0, a1_ = 0.0, a2_ = 0.0;
     dfType transformType = dfType::dfI;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Transformations)

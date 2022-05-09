@@ -24,11 +24,9 @@ public:
     SampleType b0() { return b0_; };
     SampleType b1() { return b1_; };
     SampleType b2() { return b2_; };
-    SampleType a0() { return 1.0; };
+    SampleType a0() { return a0_; };
     SampleType a1() { return a1_; };
     SampleType a2() { return a2_; };
-
-
 
     //==============================================================================
     void calculateCoefficients (SampleType G0, SampleType G, SampleType GB, SampleType w0, SampleType Dw)
@@ -70,16 +68,17 @@ public:
             b0_ = (G1 + G0*W2 + B) / (SampleType(1.0) + W2 + A);
             b1_ = SampleType(-2.0) * ((G1 - G0*W2) / (SampleType(1.0) + W2 + A));
             b2_ = (G1 - B + G0*W2) / (SampleType(1.0) + W2 + A);
+            a0_ = SampleType(1.0);
             a1_ = SampleType(-2.0) * ((1 - W2) / (SampleType(1.0) + W2 + A)),
             a2_ = (SampleType(1.0) + W2 - A) / (SampleType(1.0) + W2 + A);
         }
     }
 
 private:
-    SampleType b0_{ 0.0 };
+    SampleType b0_{ 1.0 };
     SampleType b1_{ 0.0 };
     SampleType b2_{ 0.0 };
-    SampleType a0_{ 0.0 };
+    SampleType a0_{ 1.0 };
     SampleType a1_{ 0.0 };
     SampleType a2_{ 0.0 };
     
