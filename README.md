@@ -64,7 +64,7 @@ The two "transposed" forms provide us the same output characteristics for the sa
 
 + The transposed Direct Form I ("DFI(t)") utilizes the four unit-delays of it's predecessor, meaning instability while passing audio during parameter modulation, yet also incurs the exact same "round-off error" and quantization noise as the original DFII structure.
 
-+ The Transposed Direct Form II, on the other hand, likewise uses only two unit-delays as per it's predecessor, making it much more amenable to audio-rate modulation; however, this form also manages to avoid the higher "round-off" error and quantization noise of it's predecessor (and the DFI(t) structure).
++ The Transposed Direct Form II, on the other hand, similarly uses only two unit-delays as per it's predecessor, making it much more amenable to audio-rate modulation; meanwhile, this form also successfully manages to avoid the higher "round-off" error and quantization noise of it's predecessor (and the DFI(t) structure).
 
 # With all four arrangements compared;
 
