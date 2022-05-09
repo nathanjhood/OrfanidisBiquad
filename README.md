@@ -115,7 +115,7 @@ However, out of sight and out of mind does not mean out the window; we are able 
 
 ![Direct Form II calc Y](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFII%20y.svg)
 
-![Direct Form II core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5290dff7983371defd823ddf481fb659b5a35c85/Res/Workbench%20-%20DFII%20(coded%20by%20StoneyDSP).png)
+![Direct Form II core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/8cab54019b024ef532892ee12846403297755c02/Res/Workbench%20-%20DFII%20(coded%20by%20StoneyDSP).png)
 
     {
     
