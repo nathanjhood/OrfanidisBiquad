@@ -56,7 +56,7 @@ For the "transposed" forms, all terms are inverted (signal flow reversed, summin
 
 As depicted in the above diagrams, the Direct Form I ("DFI") and II ("DFII") utlize a chain of single-sample unit delays in a feedback arrangement, with the coefficients a1 through to b0 controlling the gain at various points in the feedback network (in the case of DFII, actually two feedback networks).
 
-+ DFI utlizes a total of four samples of delay, with DFII requiring only two samples. The higher number of unit delays present in the DFI structure make this arrangement relatively unstable when modulating the parameters while simultaneously passing audio, resulting in loud (and potentially damaging) clicks and pops in the resulting audio. In our test workbench (running as a VST3 effect in Reaper), even just moderate sweeps of the filter frequency control can incur signal overloads significant enough to trigger the in-built "channel auto-mute" safety feature, which avoids sending potentially damaging signals to the audio playback device and speakers.
++ DFI utlizes a total of four samples of delay ("z-1"), with DFII requiring only two samples. The higher number of unit delays present in the DFI structure make this arrangement relatively unstable when modulating the parameters while simultaneously passing audio, resulting in loud (and potentially damaging) clicks and pops in the resulting audio. In our test workbench (running as a VST3 effect in Reaper), even just moderate sweeps of the filter frequency control can incur signal overloads significant enough to trigger the in-built "channel auto-mute" safety feature, which avoids sending potentially damaging signals to the audio playback device and speakers.
 
 + DFII, using less unit delays in it's architecture, produces much less significant artefacts during parameter modulation; in all but the most extreme cases, the output remains relatively benign. However, this structure is far more prone to "round-off" errors due to a narrowing computational precision in certain parts of the feedback network; this can manifest as a kind of "quantization noise" - much like un-dithered fixed-point audio - creeping well into the audible range, and in some cases enveloping low-amplitudinal parts of the input signal. This can be particularly extenuated by very large boosts of a tight "bell" shape in the lowest bass frequencies, causing strong quantization-error noise to permeate the upper-mid and treble ranges of the signal (image to follow).
 
@@ -86,3 +86,49 @@ Furthermore, increasing precision to Doubles also seemingly eradicates the "notc
 However, out of sight and out of mind does not mean out the window; we are able to produce several very pronounced audible artefacts in three of the four structures when processing in Floats (commonly deemed to be a beyond acceptable processing precision for audio purposes, to be debated elsewhere). Indeed only the Transposed Direct Form II manages favourably in all cases, and thus appears to be the prime candidate transformation for Biquad-based Equalizers in all audio application contexts at the time of writing.
 
 ^ Reference: Transformations images taken from: https://en.wikipedia.org/wiki/Digital_biquad_filter
+
+# Creating the transformations;
+
++ Direct Form I:
+
+![Direct Form I calc] (Res/DFI.svg)
+
+![Direct Form I core] (Res/Workbench - DFI (coded by Native Instruments).png)
+
+{
+    Xn = inputValue;
+
+    Yn = ((Xn * b0) + (Xn(z-1) * b1) + (Xn(z-2) * b2) + (Yn(z-1) * -a1) + (Yn(z-2) * -a2));
+    
+    Xn(z-2) = Xn(z-1);
+    Xn(z-1) = Xn;
+    
+    Yn(z-2) = Yn(z-1);
+    Yn(z-1) = Yn;
+
+    return Yn;
+}
+
++ Direct Form II:
+
+![Direct Form II calc W] (Res/DFII w.svg)
+
+![Direct Form II calc Y] (Res/DFII y.svg)
+
+![Direct Form II core] (Res/Workbench - DFII (coded by StoneyDSP).png)
+
+{
+    Xn = input sample;
+
+    Wn = (Xn + ((Wn(z-1) * -a1) + (Wn(z-2) * -a2)));
+    Yn = ((Wn * b0) + (Wn(z-1) * b1) + (Wn(z-2) * b2));
+
+    Wn(z-2) = Wn(z-1);
+    Wn(z-1) = Wn;
+
+    return Yn;
+}
+
+^ Credit: Native Instruments for the Direct Form I code (taken from Reaktor 5's Core "Static Filter" library - go figure!) as well as the Core library unit delay, audio thread, and math modulation macros used here.
+
+^^ Reference: Transformations images taken from: https://en.wikipedia.org/wiki/Digital_biquad_filter
