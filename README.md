@@ -87,15 +87,14 @@ However, out of sight and out of mind does not mean out the window; we are able 
 
 ^ Reference: Transformations images taken from: https://en.wikipedia.org/wiki/Digital_biquad_filter
 
-# Creating the transformations;
+# Creating the transformations - Direct Form I;
 
-+ Direct Form I:
+![Direct Form I calc](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFI.svg)
 
-![Direct Form I calc](Res/DFI.svg)
+![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/Workbench%20-%20DFI%20(coded%20by%20Native%20Instruments).png)
 
-![Direct Form I core](Res/Workbench - DFI (coded by Native Instruments).png)
-
-{
+    {
+    
     Xn = inputValue;
 
     Yn = ((Xn * b0) + (Xn(z-1) * b1) + (Xn(z-2) * b2) + (Yn(z-1) * -a1) + (Yn(z-2) * -a2));
@@ -107,19 +106,21 @@ However, out of sight and out of mind does not mean out the window; we are able 
     Yn(z-1) = Yn;
 
     return Yn;
-}
+    
+    }
 
-+ Direct Form II:
+# Creating the transformations - Direct Form II;
 
-![Direct Form II calc W](Res/DFII w.svg)
+![Direct Form II calc W](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFII%20w.svg)
 
-![Direct Form II calc Y](Res/DFII y.svg)
+![Direct Form II calc Y](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFII%20y.svg)
 
-![Direct Form II core](Res/Workbench - DFII (coded by StoneyDSP).png)
+![Direct Form II core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5290dff7983371defd823ddf481fb659b5a35c85/Res/Workbench%20-%20DFII%20(coded%20by%20StoneyDSP).png)
 
-{
+    {
+    
     Xn = input sample;
-
+    
     Wn = (Xn + ((Wn(z-1) * -a1) + (Wn(z-2) * -a2)));
     Yn = ((Wn * b0) + (Wn(z-1) * b1) + (Wn(z-2) * b2));
 
@@ -127,7 +128,8 @@ However, out of sight and out of mind does not mean out the window; we are able 
     Wn(z-1) = Wn;
 
     return Yn;
-}
+    
+    }
 
 ^ Credit: Native Instruments for the Direct Form I code (taken from Reaktor 5's Core "Static Filter" library - go figure!) as well as the Core library unit delay, audio thread, and math modulation macros used here.
 
