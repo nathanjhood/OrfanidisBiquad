@@ -91,9 +91,9 @@ However, out of sight and out of mind does not mean out the window; we are able 
 
 + Direct Form I:
 
-![Direct Form I calc] (Res/DFI.svg)
+![Direct Form I calc](Res/DFI.svg)
 
-![Direct Form I core] (Res/Workbench - DFI (coded by Native Instruments).png)
+![Direct Form I core](Res/Workbench - DFI (coded by Native Instruments).png)
 
 {
     Xn = inputValue;
@@ -111,11 +111,11 @@ However, out of sight and out of mind does not mean out the window; we are able 
 
 + Direct Form II:
 
-![Direct Form II calc W] (Res/DFII w.svg)
+![Direct Form II calc W](Res/DFII w.svg)
 
-![Direct Form II calc Y] (Res/DFII y.svg)
+![Direct Form II calc Y](Res/DFII y.svg)
 
-![Direct Form II core] (Res/Workbench - DFII (coded by StoneyDSP).png)
+![Direct Form II core](Res/Workbench - DFII (coded by StoneyDSP).png)
 
 {
     Xn = input sample;
