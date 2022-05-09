@@ -91,7 +91,7 @@ However, out of sight and out of mind does not mean out the window; we are able 
 
 ![Direct Form I calc](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFI.svg)
 
-![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/Workbench%20-%20DFI%20(coded%20by%20Native%20Instruments).png)
+![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/3170a60ffa2696ae42f426c74b20188f12361c36/Res/Workbench%20-%20DFI%20(coded%20by%20Native%20Instruments).png)
 
     {
     
