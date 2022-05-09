@@ -9,15 +9,12 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "OrfanidisCalc.h"
-#include "Convert.h"
-#include "PeakFilter.h"
-#include "Transform.h"
+#include "ProcessorWrapper.h"
 
 //==============================================================================
 /**
 */
-class OrfanidisBiquadAudioProcessor  : public juce::AudioProcessor
+class OrfanidisBiquadAudioProcessor : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -29,12 +26,12 @@ public:
     bool supportsDoublePrecisionProcessing() const;
 
     //==============================================================================
-    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
-    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#ifndef JucePlugin_PreferredChannelConfigurations
+    bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
+#endif
 
     //==============================================================================
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
@@ -57,13 +54,13 @@ public:
     //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
-    void setCurrentProgram (int index) override;
-    const juce::String getProgramName (int index) override;
-    void changeProgramName (int index, const juce::String& newName) override;
+    void setCurrentProgram(int index) override;
+    const juce::String getProgramName(int index) override;
+    void changeProgramName(int index, const juce::String& newName) override;
 
     //==============================================================================
-    void getStateInformation (juce::MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
+    void getStateInformation(juce::MemoryBlock& destData) override;
+    void setStateInformation(const void* data, int sizeInBytes) override;
 
     //==============================================================================
     juce::AudioProcessorValueTreeState& getAPVTS();
@@ -77,24 +74,14 @@ private:
     void update();
 
     //==============================================================================
-    juce::AudioParameterFloat* gain;
-    juce::AudioParameterFloat* frequency;
-    juce::AudioParameterFloat* bandwidth;
-    juce::AudioParameterChoice* type;
-
+    /** Audio processor members. */
     juce::dsp::ProcessSpec spec;
-
-    OrfanidisCalc<float> coeffs;
-    Conversion<float> convert;
-    Transformations<float> transform;
+    ProcessWrapper<float> processor{ (apvts) };
 
     //==============================================================================
     /** Parameter pointers. */
     juce::AudioParameterBool* bitsPtr{ nullptr };
     juce::AudioParameterBool* bypPtr{ nullptr };
-    juce::AudioParameterFloat* gainPtr{ nullptr };
-    juce::AudioParameterFloat* freqPtr{ nullptr };
-    juce::AudioParameterFloat* bandPtr{ nullptr };
     juce::AudioParameterChoice* transPtr{ nullptr };
 
     //==============================================================================
