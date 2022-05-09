@@ -130,6 +130,42 @@ However, out of sight and out of mind does not mean out the window; we are able 
     return Yn;
     
     }
+    
+# Creating the transformations - Direct Form I Transposed;
+
+![Direct Form I transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFI%20transposed%20(coded%20by%20StoneyDSP).png)
+
+    {
+    
+    Xn = input sample;
+    
+    Wn = (Xn + Wn(z-2));
+    Yn = ((Wn * b0) + Xn(z-2);
+    
+    Xn(z-2) = ((Wn * b1) + Xn(z-1));
+    Xn(z-1) = (Wn * b2);
+    
+    Wn(z-2) = ((Wn * a1) + Wn(z-1));
+    Wn(z-1) = (Wn * a2);
+    
+    return Yn;
+    
+    }
+    
+![Direct Form II transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFII%20transposed%20(coded%20by%20StoneyDSP).png)
+
+    {
+    
+    Xn = input sample;
+    
+    Yn = ((Xn * b0) + (Xn(z-2));
+    
+    Xn(z-2) = ((Xn * b1) + (Xn(z-1)) + (Yn * a1));
+    Xn(z-1) = ((Xn * b2) + (Yn * a2));
+    
+    return Yn;
+    
+    }
 
 ^ Credit: Native Instruments for the Direct Form I code (taken from Reaktor 5's Core "Static Filter" library - go figure!) as well as the Core library unit delay, audio thread, and math modulation macros used here.
 
