@@ -27,11 +27,11 @@ Determining an output transfer function (Y(z)), given an input value (X(z)) and 
 
 + <-, ->.. etc = signal flow direction 
 
-![Direct Form I](Res/496px-Digital_Biquad_Direct_Form_1_Untransformed.svg.png)
+![DF I](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/400px-Biquad_filter_DF-I.svg.png)
 
  Some forms have what may be considered an additional audio feedback path (notated as W(z) in this description, but may vary);
 
-![Direct Form II](Res/496px-Digital_Biquad_Direct_Form_2_Untransformed.svg.png)
+![DF II](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Biquad_filter_DF-IIx.svg.png)
 
 
 # Creating the transformations - getting started;
@@ -66,7 +66,13 @@ First, we need to create an input (Xn), and output (Yn), and our 6 coefficients 
 
 (please note that extra care is taken where necessary within the code to ensure thread safety between parameter (message thread) and playback (audio thread).)
 
+I have also re-created all steps in my preferred visual-programming/workbench environment, Reaktor Core, which I have chosen to share for here the very same reason I re-created this code within said program; ease of readability;
 
+![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
+
+For any readers unfamiliar with Reaktor Core, this symbol legend may help fill in a few blanks;
+
+![legend](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Legend%20(coded%20by%20StoneyDSP).png)
 
 # Creating the transformations - Direct Form I;
 
