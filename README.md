@@ -15,8 +15,6 @@ Nyquist-Frequency Gain", Sophocles J. Orfanidis, 1996; https://www.ece.rutgers.e
 # Transformations
 Determining an output transfer function (Y(z)), given an input value (X(z)) and six multiplier coefficients within an audio feedback path (b0, b1, b2, a1, and a2 - all of which are pre-scaled by 1/a0) - please note that each feedback term requires a delay of one audio sample;
 
-
-
 + X(z) = input sample
 
 + Y(z) = output sample
