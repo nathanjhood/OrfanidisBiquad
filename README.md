@@ -42,7 +42,7 @@ Here's some pseudo-code to get us started with a template;
 
     {
     
-    Xn = input sample;                                                             // audio input stream...
+    X = input sample;                                                             // audio input stream...
     
     _b0 = 1;                                                                       // initialize coefficients to safe numbers...
     _b1 = 0;
@@ -51,7 +51,7 @@ Here's some pseudo-code to get us started with a template;
     _a1 = 0;
     _a2 = 0;
     
-    a0 = (1 / a0_);                                                                 // calculate new coefficients based on parameter changes to the above...
+    a0 = (1 / a0_);                                                                 // calculate new coefficients from parameters...
 
     a1 = (-1 * (a1_ * a0));
     a2 = (-1 * (a2_ * a0));
@@ -60,9 +60,9 @@ Here's some pseudo-code to get us started with a template;
     b1 = (b1_ * a0);
     b2 = (b2_ * a0);
     
-    Yn = ((Xn * b0) + (Xn * b1) + (Xn * b2) + (Xn * a1) + (Xn * a2));                // apply coefficients to obtain our output transfer function...
+    Y = ((X * b0) + (X * b1) + (X * b2) + (X * a1) + (X * a2));                     // apply coefficients to input sample...
     
-    return Yn;                                                                       // audio output stream...
+    output sample = Y;                                                              // audio output stream...
     
     }
 
@@ -94,13 +94,13 @@ Flow diagram:
 
 Implementation:
 
-![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/3170a60ffa2696ae42f426c74b20188f12361c36/Res/Workbench%20-%20DFI%20(coded%20by%20Native%20Instruments).png)
+![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/e8a995fec9f730532160692e6f69e9800725756e/Res/DFI_core.png)
 
 Pseudo-code:
 
     {
     
-    Xn = input sample;
+    X = input sample;
     
     _b0 = 1;
     _b1 = 0;
@@ -118,15 +118,15 @@ Pseudo-code:
     b1 = (b1_ * a0);
     b2 = (b2_ * a0);
 
-    Yn = ((Xn * b0) + (Xn(z-1) * b1) + (Xn(z-2) * b2) + (Yn(z-1) * a1) + (Yn(z-2) * a2));
+    Y = ((X * b0) + (X(z-1) * b1) + (X(z-2) * b2) + (Y(z-1) * a1) + (Y(z-2) * a2));
     
-    Xn(z-2) = Xn(z-1);
-    Xn(z-1) = Xn;
+    X(z-2) = X(z-1);
+    X(z-1) = X;
     
-    Yn(z-2) = Yn(z-1);
-    Yn(z-1) = Yn;
+    Y(z-2) = Y(z-1);
+    Y(z-1) = Y;
 
-    return Yn;
+    output sample = Y;
     
     }
 
@@ -152,13 +152,13 @@ Flow diagram:
 
 Implementation:
 
-![Direct Form II core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/8cab54019b024ef532892ee12846403297755c02/Res/Workbench%20-%20DFII%20(coded%20by%20StoneyDSP).png)
+![Direct Form II core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/e8a995fec9f730532160692e6f69e9800725756e/Res/DFII_core.png)
 
 Pseudo-code:
 
     {
     
-    Xn = input sample;
+    X = input sample;
     
     _b0 = 1;
     _b1 = 0;
@@ -176,13 +176,13 @@ Pseudo-code:
     b1 = (b1_ * a0);
     b2 = (b2_ * a0);
     
-    Wn = (Xn + ((Wn(z-1) * a1) + (Wn(z-2) * a2)));
-    Yn = ((Wn * b0) + (Wn(z-1) * b1) + (Wn(z-2) * b2));
+    W = (X + ((W(z-1) * a1) + (W(z-2) * a2)));
+    Y = ((W * b0) + (W(z-1) * b1) + (W(z-2) * b2));
 
-    Wn(z-2) = Wn(z-1);
-    Wn(z-1) = Wn;
+    W(z-2) = W(z-1);
+    W(z-1) = W;
 
-    return Yn;
+    output sample = Y;
     
     }
 
@@ -202,14 +202,14 @@ Flow diagram:
 
 Implementation:
 
-![Direct Form I transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFI%20transposed%20(coded%20by%20StoneyDSP).png)
+![Direct Form I transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/e8a995fec9f730532160692e6f69e9800725756e/Res/DFtI_core.png)
 
 Pseudo-code:
 
 
     {
     
-    Xn = input sample;
+    X = input sample;
     
     _b0 = 1;
     _b1 = 0;
@@ -227,16 +227,16 @@ Pseudo-code:
     b1 = (b1_ * a0);
     b2 = (b2_ * a0);
     
-    Wn = (Xn + Wn(z-2));
-    Yn = ((Wn * b0) + Xn(z-2);
+    W = (X + W(z-2));
+    Y = ((W * b0) + X(z-2);
     
-    Xn(z-2) = ((Wn * b1) + Xn(z-1));
-    Xn(z-1) = (Wn * b2);
+    X(z-2) = ((W * b1) + X(z-1));
+    X(z-1) = (W * b2);
     
-    Wn(z-2) = ((Wn * a1) + Wn(z-1));
-    Wn(z-1) = (Wn * a2);
+    W(z-2) = ((W * a1) + W(z-1));
+    W(z-1) = (W * a2);
     
-    return Yn;
+    output sample = Y;
     
     }
     
@@ -268,13 +268,13 @@ Flow diagram:
 
 Implementation:
     
-![Direct Form II transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFII%20transposed%20(coded%20by%20StoneyDSP).png)
+![Direct Form II transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/e8a995fec9f730532160692e6f69e9800725756e/Res/DFtII_core.png)
 
 Pseudo-code:
 
     {
     
-    Xn = input sample;
+    X = input sample;
     
     _b0 = 1;
     _b1 = 0;
@@ -292,12 +292,12 @@ Pseudo-code:
     b1 = (b1_ * a0);
     b2 = (b2_ * a0);
     
-    Yn = ((Xn * b0) + (Xn(z-2));
+    Y = ((X * b0) + (X(z-2));
     
-    Xn(z-2) = ((Xn * b1) + (Xn(z-1)) + (Yn * a1));
-    Xn(z-1) = ((Xn * b2) + (Yn * a2));
+    X(z-2) = ((X * b1) + (X(z-1)) + (Y * a1));
+    X(z-1) = ((X * b2) + (Y * a2));
     
-    return Yn;
+    output sample = Y;
     
     }
     
