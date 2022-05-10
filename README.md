@@ -42,23 +42,23 @@ First, we need to create an input (Xn), and output (Yn), and our 6 coefficients 
     
     Xn = input sample;
     
-    b0 = 1;
-    b1 = 0;
-    b2 = 0;
-    a0 = 1;
-    a1 = 0;
-    a2 = 0;
+    _b0 = 1;
+    _b1 = 0;
+    _b2 = 0;
+    _a0 = 1;
+    _a1 = 0;
+    _a2 = 0;
     
-    a0_ = (1 / a0);
+    a0 = (1 / a0_);
     
-    -a1_ = (-1 * (a1 * a0_));
-    -a2_ = (-1 * (a2 * a0_));
+    a1 = (-1 * (a1_ * a0));
+    a2 = (-1 * (a2_ * a0));
     
-    b0_ = (b0 * a0_);
-    b1_ = (b1 * a0_);
-    b2_ = (b2 * a0_);
+    b0 = (b0_ * a0);
+    b1 = (b1_ * a0);
+    b2 = (b2_ * a0);
     
-    Yn = ((Xn * b0_) + (Xn * b1_) + (Xn * b2_) + (Xn * -a1_) + (Xn * -a2_));
+    Yn = ((Xn * b0) + (Xn * b1) + (Xn * b2) + (Xn * a1) + (Xn * a2));
     
     return Yn;
     
@@ -89,8 +89,24 @@ Direct Form I is characterized by having a total four unit delays present within
     {
     
     Xn = inputValue;
+    
+    _b0 = 1;
+    _b1 = 0;
+    _b2 = 0;
+    _a0 = 1;
+    _a1 = 0;
+    _a2 = 0;
 
-    Yn = ((Xn * b0) + (Xn(z-1) * b1) + (Xn(z-2) * b2) + (Yn(z-1) * -a1) + (Yn(z-2) * -a2));
+    a0 = (1 / a0_);
+
+    a1 = (-1 * (a1_ * a0));
+    a2 = (-1 * (a2_ * a0));
+
+    b0 = (b0_ * a0);
+    b1 = (b1_ * a0);
+    b2 = (b2_ * a0);
+
+    Yn = ((Xn * b0) + (Xn(z-1) * b1) + (Xn(z-2) * b2) + (Yn(z-1) * a1) + (Yn(z-2) * a2));
     
     Xn(z-2) = Xn(z-1);
     Xn(z-1) = Xn;
@@ -118,7 +134,23 @@ Direct Form II (also known as the "canonical" form, at least of the two discusse
     
     Xn = input sample;
     
-    Wn = (Xn + ((Wn(z-1) * -a1) + (Wn(z-2) * -a2)));
+    _b0 = 1;
+    _b1 = 0;
+    _b2 = 0;
+    _a0 = 1;
+    _a1 = 0;
+    _a2 = 0;
+
+    a0 = (1 / a0_);
+
+    a1 = (-1 * (a1_ * a0));
+    a2 = (-1 * (a2_ * a0));
+
+    b0 = (b0_ * a0);
+    b1 = (b1_ * a0);
+    b2 = (b2_ * a0);
+    
+    Wn = (Xn + ((Wn(z-1) * a1) + (Wn(z-2) * a2)));
     Yn = ((Wn * b0) + (Wn(z-1) * b1) + (Wn(z-2) * b2));
 
     Wn(z-2) = Wn(z-1);
@@ -139,6 +171,22 @@ For the "transposed" forms, all terms are inverted (signal flow reversed, summin
     {
     
     Xn = input sample;
+    
+    _b0 = 1;
+    _b1 = 0;
+    _b2 = 0;
+    _a0 = 1;
+    _a1 = 0;
+    _a2 = 0;
+
+    a0 = (1 / a0_);
+
+    a1 = (-1 * (a1_ * a0));
+    a2 = (-1 * (a2_ * a0));
+
+    b0 = (b0_ * a0);
+    b1 = (b1_ * a0);
+    b2 = (b2_ * a0);
     
     Wn = (Xn + Wn(z-2));
     Yn = ((Wn * b0) + Xn(z-2);
@@ -170,6 +218,22 @@ Direct Form II transposed only requires the two unit delays (like it's non-trans
     {
     
     Xn = input sample;
+    
+    _b0 = 1;
+    _b1 = 0;
+    _b2 = 0;
+    _a0 = 1;
+    _a1 = 0;
+    _a2 = 0;
+
+    a0 = (1 / a0_);
+
+    a1 = (-1 * (a1_ * a0));
+    a2 = (-1 * (a2_ * a0));
+
+    b0 = (b0_ * a0);
+    b1 = (b1_ * a0);
+    b2 = (b2_ * a0);
     
     Yn = ((Xn * b0) + (Xn(z-2));
     
