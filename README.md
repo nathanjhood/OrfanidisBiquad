@@ -70,9 +70,11 @@ I have also re-created all of the code from this study in my preferred visual-pr
 
 ![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
 
-For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the math operators connecting inputs to outputs, we have a few macros that may raise queries - this symbol legend may help fill in a few blanks;
+For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the basic math operators connecting inputs to outputs (grey), we have a few macros that may raise queries - this symbol legend may help fill in a few blanks;
 
 ![legend](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Legend%20(coded%20by%20StoneyDSP).png)
+
+*The blue macros perform a memory allocation as part of their operation, in case you were curious. This is useful for thread safety, which we have also somewhat considered within the pseudo-code (and indeed test plugin) that follows.*  
 
 Now I shall use a combination of visuals and pseudo-code to re-create and further investigate our various transformations available within the test plugin.
 
@@ -80,15 +82,23 @@ Now I shall use a combination of visuals and pseudo-code to re-create and furthe
 
 Direct Form I is characterized by having a total four unit delays present within it's architecture, with two coefficients (a1 and a2) arranged as to control negative feedback gain, and the remaining three (b0 to b2) controlling positive feedback gain, with all feedback terms summed (added) together in a simple linear fashion;  
 
++ Calculus:
+
 ![Direct Form I calc](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFI.svg)
+
++ Flow diagram:
 
 ![Direct Form I](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_1_Untransformed.svg.png)
 
++ Implementation:
+
 ![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/3170a60ffa2696ae42f426c74b20188f12361c36/Res/Workbench%20-%20DFI%20(coded%20by%20Native%20Instruments).png)
+
++ Pseudo-code:
 
     {
     
-    Xn = inputValue;
+    Xn = input sample;
     
     _b0 = 1;
     _b1 = 0;
@@ -118,17 +128,29 @@ Direct Form I is characterized by having a total four unit delays present within
     
     }
 
++ Notes:
+
+DFI utlizes a total of four samples of delay ("z-1"). This (comparatively) higher number of unit delays present in the DFI structure make this arrangement relatively unstable when modulating the parameters while simultaneously passing audio, resulting in loud (and potentially damaging) clicks and pops in the resulting audio. In our test workbench (running as a VST3 effect in Reaper), even just moderate sweeps of the filter frequency control can incur signal overloads significant enough to trigger the in-built "channel auto-mute" safety feature, which avoids sending potentially damaging signals to the audio playback device and speakers.
+
 # Direct Form II;
 
 Direct Form II (also known as the "canonical" form, at least of the two discussed thus far) uses the same arrangement of coefficents, but only two unit delays - it also has what may be viewed as a "second" feedback path, here denoted as W(n);
+
++ Calculus:
 
 ![Direct Form II calc W](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFII%20w.svg)
 
 ![Direct Form II calc Y](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFII%20y.svg)
 
++ Flow diagram:
+
 ![Direct Form II](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_2_Untransformed.svg.png)
 
++ Implementation:
+
 ![Direct Form II core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/8cab54019b024ef532892ee12846403297755c02/Res/Workbench%20-%20DFII%20(coded%20by%20StoneyDSP).png)
+
++ Pseudo-code:
 
     {
     
@@ -159,14 +181,25 @@ Direct Form II (also known as the "canonical" form, at least of the two discusse
     return Yn;
     
     }
-    
+
++ Notes:
+
+DFII, using less unit delays in it's architecture, produces much less significant artefacts during parameter modulation; in all but the most extreme cases, the output remains relatively benign. However, this structure is far more prone to "round-off" errors due to a narrowing computational precision in certain parts of the feedback network; this can manifest as a kind of "quantization noise" - much like un-dithered fixed-point audio - creeping well into the audible range, and in some cases enveloping low-amplitudinal parts of the input signal. This can be particularly extenuated by very large boosts of a tight "bell" shape in the lowest bass frequencies, causing strong quantization-error noise to permeate the upper-mid and treble ranges of the signal (image to follow).
+
 # Direct Form I Transposed;
 
 For the "transposed" forms, all terms are inverted (signal flow reversed, summing points become split points, and multpiliers swap positions), creating the same output transfer function for the same number of components but in a somewhat "mirrored" directional flow of our input signal, resulting in our coefficient multiplactions occuring before the unit delays;
 
++ Flow diagram:
+
 ![Direct Form IT](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_1_Transformed.svg.png)
 
++ Implementation:
+
 ![Direct Form I transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFI%20transposed%20(coded%20by%20StoneyDSP).png)
+
++ Pseudo-code:
+
 
     {
     
@@ -201,9 +234,19 @@ For the "transposed" forms, all terms are inverted (signal flow reversed, summin
     
     }
     
++ Notes:
+
+The transposed Direct Form I ("DFI(t)") utilizes the four unit-delays of it's predecessor, meaning instability while passing audio during parameter modulation, while it *also* incurs the exact same "round-off error" and quantization noise as the original DFII structure. This is a dangerous combination for real-world audio use-cases, such as a mixing scenario.
+
+So far, we've encountered one transformation resulting in zipper noise, one resulting in quantization noise, and one resulting in *both*.
+
+This may seem discouraging, but we still have one final arrangement to try.
+
 # Direct Form II Transposed;
 
 Direct Form II transposed only requires the two unit delays (like it's non-transposed counterpart), as opposed to the four of the Direct Form I (both counterparts), and likewise features it's multiplication coefficients happening before the unit delays occur;
+
++ Calculus:
 
 ![Direct Form IIT calc y](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/DFIIt%20y.svg)
 
@@ -211,9 +254,15 @@ Direct Form II transposed only requires the two unit delays (like it's non-trans
 
 ![Direct Form IIT calc s2](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/DFIIt%20s2.svg)
 
++ Flow diagram:
+
 ![Direct Form IIT](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_2_Transformed.svg.png)
+
++ Implementation:
     
 ![Direct Form II transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFII%20transposed%20(coded%20by%20StoneyDSP).png)
+
++ Pseudo-code:
 
     {
     
@@ -244,28 +293,26 @@ Direct Form II transposed only requires the two unit delays (like it's non-trans
     
     }
     
-# Observations on the various Direct Form topologies in real-time audio use-cases;
++ Notes:
 
-As depicted in the above diagrams, the Direct Form I ("DFI") and II ("DFII") utlize a chain of single-sample unit delays in a feedback arrangement, with the coefficients a1 through to b0 controlling the gain at various points in the feedback network (in the case of DFII, actually two feedback networks).
+The Transposed Direct Form II, similarly to it's predecessor, uses only two unit-delays, making it much more amenable to audio-rate modulation; meanwhile, this form also successfully manages to avoid the higher "round-off" error and quantization noise of it's predecessor (and the DFI(t) structure).
 
-+ DFI utlizes a total of four samples of delay ("z-1"), with DFII requiring only two samples. The higher number of unit delays present in the DFI structure make this arrangement relatively unstable when modulating the parameters while simultaneously passing audio, resulting in loud (and potentially damaging) clicks and pops in the resulting audio. In our test workbench (running as a VST3 effect in Reaper), even just moderate sweeps of the filter frequency control can incur signal overloads significant enough to trigger the in-built "channel auto-mute" safety feature, which avoids sending potentially damaging signals to the audio playback device and speakers.
+# Observations and comparisons;
 
-+ DFII, using less unit delays in it's architecture, produces much less significant artefacts during parameter modulation; in all but the most extreme cases, the output remains relatively benign. However, this structure is far more prone to "round-off" errors due to a narrowing computational precision in certain parts of the feedback network; this can manifest as a kind of "quantization noise" - much like un-dithered fixed-point audio - creeping well into the audible range, and in some cases enveloping low-amplitudinal parts of the input signal. This can be particularly extenuated by very large boosts of a tight "bell" shape in the lowest bass frequencies, causing strong quantization-error noise to permeate the upper-mid and treble ranges of the signal (image to follow).
+As depicted in the above diagrams, the Direct Form I ("DFI") and II ("DFII") utlize a chain of single-sample unit delays in a feedback arrangement, with the coefficients a1 through to b2 controlling the gain at various points in the feedback network (in the case of DFII, actually two feedback networks).
 
-The two "transposed" forms provide us the same output characteristics for the same number of components, but arranged in inverse terms as compared with the non-transposed forms; summing points become split points, gain multpiliers swap positions within the network, and the entire signal flow is reversed (our images are also flipped around to keep the input and output directions visually aligned with the previous structures). The results are interesting; 
+The two "transposed" forms provide us the same output characteristics for the same number of components, but arranged in inverse terms as compared with the non-transposed forms; summing points become split points, gain multpiliers swap positions within the network, and the entire signal flow is reversed (our images are also flipped around to keep the input and output directions visually aligned with the previous structures). 
 
-+ The transposed Direct Form I ("DFI(t)") utilizes the four unit-delays of it's predecessor, meaning instability while passing audio during parameter modulation, yet also incurs the exact same "round-off error" and quantization noise as the original DFII structure.
-
-+ The Transposed Direct Form II, on the other hand, similarly uses only two unit-delays as per it's predecessor, making it much more amenable to audio-rate modulation; meanwhile, this form also successfully manages to avoid the higher "round-off" error and quantization noise of it's predecessor (and the DFI(t) structure).
-
-(images to follow)
-    
-# With all four arrangements compared;
+If we compare the results side by side, the results are interesting; 
 
 + DFI = four delay units (unstable modulation and higher footprint), higher precision (less quantization noise)
 + DFII =  two delay units (stable modulation and lower footprint), lower precision (more quantization noise)
 + DFI(t) = four delay units (unstable modulation and higher footprint), lower precision (more quantization noise)
 + DFII(t) = two delay units (stable modulation and lower footprint), higher precision (less quantization noise)
+
+(images to follow)
+    
+# And the winner is...;
 
 As we can observe from the above comparison, our DFII(t) structure is the most favourable in both cases - it has only two delay units, meaning it is more stable under modulation, favourably comparable to the DFII structure; it also produces less quantization noise, comparable to the DFI structure in this regard. The lower unit delay count also produces a lower memory footprint in realtime use.
 
