@@ -13,11 +13,11 @@ Nyquist-Frequency Gain", Sophocles J. Orfanidis, 1996; https://www.ece.rutgers.e
 
 
 # Transformations
-Determining an output transfer function (Y(z)), given an input value (X(z)) and six multiplier coefficients within an audio feedback path (b0, b1, b2, a1, and a2 - all of which are pre-scaled by 1/a0) - please note that each feedback term requires a delay of one audio sample;
+Determining an output transfer function (Y(n)), given an input value (X(n)) and six multiplier coefficients within an audio feedback path (b0, b1, b2, a1, and a2 - all of which are pre-scaled by 1/a0) - please note that each feedback term requires a delay of one audio sample;
 
-+ X(z) = input sample
++ X(n) = input sample
 
-+ Y(z) = output sample
++ Y(n) = output sample
 
 + b0, b1, etc.. = coefficient gain multiplier
 
@@ -29,7 +29,7 @@ Determining an output transfer function (Y(z)), given an input value (X(z)) and 
 
 ![DF I](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/400px-Biquad_filter_DF-I.svg.png)
 
- Some forms have what may be considered an additional audio feedback path (notated as W(z) in this description, but may vary);
+ Some forms have what may be considered an additional audio feedback path (notated as W(n) in this description, but may vary);
 
 ![DF II](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Biquad_filter_DF-IIx.svg.png)
 
