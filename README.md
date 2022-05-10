@@ -42,16 +42,16 @@ Here's some pseudo-code to get us started with a template;
 
     {
     
-    Xn = input sample;
+    Xn = input sample;                                                             // audio input stream...
     
-    _b0 = 1;
+    _b0 = 1;                                                                       // initialize coefficients to safe numbers...
     _b1 = 0;
     _b2 = 0;
     _a0 = 1;
     _a1 = 0;
     _a2 = 0;
     
-    a0 = (1 / a0_);
+    a0 = (1 / a0_);                                                                 // calculate new coefficients based on parameter changes to the above...
 
     a1 = (-1 * (a1_ * a0));
     a2 = (-1 * (a2_ * a0));
@@ -60,25 +60,25 @@ Here's some pseudo-code to get us started with a template;
     b1 = (b1_ * a0);
     b2 = (b2_ * a0);
     
-    Yn = ((Xn * b0) + (Xn * b1) + (Xn * b2) + (Xn * a1) + (Xn * a2));
+    Yn = ((Xn * b0) + (Xn * b1) + (Xn * b2) + (Xn * a1) + (Xn * a2));                // apply coefficients to obtain our output transfer function...
     
-    return Yn;
+    return Yn;                                                                       // audio output stream...
     
     }
 
 (please note that extra care is taken where necessary within the code to ensure thread safety between parameter (message thread) and playback (audio thread).)
 
-I have also re-created all of the code from this study in my preferred visual-programming/workbench environment, Reaktor Core, which I have chosen to share for here the very same reason I re-created this code within said program; ease of readability. Please see the above C++ code as translated visually below;
+I have also re-created all of the code from this study in my preferred visual-programming/workbench environment, Reaktor Core, which I have chosen to share here for it's ease of readability. Please see the above C++ code as translated visually into Core, below;
 
 ![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
 
-For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the basic math operators connecting inputs to outputs (grey), we have a few macros that may raise queries - this symbol legend may help fill in a few blanks;
+For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the basic math operators connecting inputs to outputs (grey), we have a few macros (blue) that may raise queries - this symbol legend may help fill in a few blanks;
 
 ![legend](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Legend%20(coded%20by%20StoneyDSP).png)
 
-*The blue macros perform a memory allocation as part of their operation, in case you were curious. This is useful for thread safety, which we have also somewhat considered within the pseudo-code (and indeed test plugin) that follows.*  
+* *The blue macros perform a memory allocation as part of their operation, in case you were curious. This is useful for thread safety, which we have also somewhat considered within the pseudo-code (and indeed test plugin) that follows.*  
 
-Now I shall use a combination of visuals and pseudo-code as presented above to re-create and further investigate our various transformations available within the test plugin.
+Now I shall use a combination of visuals and pseudo-code as presented above to re-create and further investigate our various transformations available within the test plugin. Let's begin.
 
 # Direct Form I;
 
