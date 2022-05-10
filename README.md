@@ -70,9 +70,11 @@ I have also re-created all steps in my preferred visual-programming/workbench en
 
 ![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
 
-For any readers unfamiliar with Reaktor Core, this symbol legend may help fill in a few blanks;
+For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the math operators connecting inputs to outputs, we have a few macros that may raise queries - this symbol legend may help fill in a few blanks;
 
 ![legend](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Legend%20(coded%20by%20StoneyDSP).png)
+
+Now I shall use a combination of visuals and pseudo-code to re-create and further investigate our various transformations available within the test plugin.
 
 # Creating the transformations - Direct Form I;
 
@@ -185,6 +187,8 @@ The two "transposed" forms provide us the same output characteristics for the sa
 + The transposed Direct Form I ("DFI(t)") utilizes the four unit-delays of it's predecessor, meaning instability while passing audio during parameter modulation, yet also incurs the exact same "round-off error" and quantization noise as the original DFII structure.
 
 + The Transposed Direct Form II, on the other hand, similarly uses only two unit-delays as per it's predecessor, making it much more amenable to audio-rate modulation; meanwhile, this form also successfully manages to avoid the higher "round-off" error and quantization noise of it's predecessor (and the DFI(t) structure).
+
+(images to follow)
     
 # With all four arrangements compared;
 
