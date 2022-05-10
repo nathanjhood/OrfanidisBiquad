@@ -34,9 +34,9 @@ Determining an output transfer function (Y(n)), given an input value (X(n)) and 
 ![DF II](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Biquad_filter_DF-IIx.svg.png)
 
 
-# Creating the transformations - getting started;
+# Creating the coefficients;
 
-First, we need to create an input (Xn), and output (Yn), and our 6 coefficients for gain multiplication, the results of which are summed together using linear addition;
+First, we need to create an input (Xn), and output (Yn), and our 6 coefficients for gain multiplication, the results of which are summed together using linear addition. We can start with an arrangement that simply passes the audio sample from input to output unchanged;
 
     {
     
@@ -76,13 +76,13 @@ For any readers unfamiliar with Reaktor Core, please keep in mind that signal fl
 
 Now I shall use a combination of visuals and pseudo-code to re-create and further investigate our various transformations available within the test plugin.
 
-# Creating the transformations - Direct Form I;
+# Direct Form I;
 
 Direct Form I is characterized by having a total four unit delays present within it's architecture, with two coefficients (a1 and a2) arranged as to control negative feedback gain, and the remaining three (b0 to b2) controlling positive feedback gain, with all feedback terms summed (added) together in a simple linear fashion;  
 
 ![Direct Form I calc](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFI.svg)
 
-![Direct Form I](Res/496px-Digital_Biquad_Direct_Form_1_Untransformed.svg.png)
+![Direct Form I](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_1_Untransformed.svg.png)
 
 ![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/3170a60ffa2696ae42f426c74b20188f12361c36/Res/Workbench%20-%20DFI%20(coded%20by%20Native%20Instruments).png)
 
@@ -102,7 +102,7 @@ Direct Form I is characterized by having a total four unit delays present within
     
     }
 
-# Creating the transformations - Direct Form II;
+# Direct Form II;
 
 Direct Form II (also known as the "canonical" form, at least of the two discussed thus far) uses the same arrangement of coefficents, but only two unit delays - it also has what may be viewed as a "second" feedback path, here denoted as W(n);
 
@@ -110,7 +110,7 @@ Direct Form II (also known as the "canonical" form, at least of the two discusse
 
 ![Direct Form II calc Y](https://github.com/StoneyDSP/OrfanidisBiquad/blob/79913795b69fea84185d890bc17b1998918f8e5e/Res/DFII%20y.svg)
 
-![Direct Form II](Res/496px-Digital_Biquad_Direct_Form_2_Untransformed.svg.png)
+![Direct Form II](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_2_Untransformed.svg.png)
 
 ![Direct Form II core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/8cab54019b024ef532892ee12846403297755c02/Res/Workbench%20-%20DFII%20(coded%20by%20StoneyDSP).png)
 
@@ -128,11 +128,11 @@ Direct Form II (also known as the "canonical" form, at least of the two discusse
     
     }
     
-# Creating the transformations - Direct Form I Transposed;
+# Direct Form I Transposed;
 
 For the "transposed" forms, all terms are inverted (signal flow reversed, summing points become split points, and multpiliers swap positions), creating the same output transfer function for the same number of components but in a somewhat "mirrored" directional flow of our input signal, resulting in our coefficient multiplactions occuring before the unit delays;
 
-![Direct Form IT](Res/496px-Digital_Biquad_Direct_Form_1_Transformed.svg.png)
+![Direct Form IT](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_1_Transformed.svg.png)
 
 ![Direct Form I transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFI%20transposed%20(coded%20by%20StoneyDSP).png)
 
@@ -153,11 +153,17 @@ For the "transposed" forms, all terms are inverted (signal flow reversed, summin
     
     }
     
-# Creating the transformations - Direct Form II Transposed;
+# Direct Form II Transposed;
 
-Direct Form II transposed only requires the two unit delays (like it's non-transposed counterpart), as opposed to the four of the Direct Form I (both counterparts), and likewise features it's multiplcation coefficients happening before the unit delays occur;
+Direct Form II transposed only requires the two unit delays (like it's non-transposed counterpart), as opposed to the four of the Direct Form I (both counterparts), and likewise features it's multiplication coefficients happening before the unit delays occur;
 
-![Direct Form IIT](Res/496px-Digital_Biquad_Direct_Form_2_Transformed.svg.png)
+![Direct Form IIT calc y](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/DFIIt%20y.svg)
+
+![Direct Form IIT calc s1](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/DFIIt%20s1.svg)
+
+![Direct Form IIT calc s2](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/DFIIt%20s2.svg)
+
+![Direct Form IIT](https://github.com/StoneyDSP/OrfanidisBiquad/blob/532db8ad616b7c0ed7f51e13772adba6b54e5cf3/Res/496px-Digital_Biquad_Direct_Form_2_Transformed.svg.png)
     
 ![Direct Form II transposed core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/5bd7d03001aa5e90b2c92a29a909a4f51e0d9367/Res/Workbench%20-%20DFII%20transposed%20(coded%20by%20StoneyDSP).png)
 
