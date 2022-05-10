@@ -66,7 +66,7 @@ First, we need to create an input (Xn), and output (Yn), and our 6 coefficients 
 
 (please note that extra care is taken where necessary within the code to ensure thread safety between parameter (message thread) and playback (audio thread).)
 
-I have also re-created all steps in my preferred visual-programming/workbench environment, Reaktor Core, which I have chosen to share for here the very same reason I re-created this code within said program; ease of readability;
+I have also re-created all of the code from this study in my preferred visual-programming/workbench environment, Reaktor Core, which I have chosen to share for here the very same reason I re-created this code within said program; ease of readability. Please see the above C++ code as translated visually below;
 
 ![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
 
