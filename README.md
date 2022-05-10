@@ -50,10 +50,10 @@ First, we need to create an input (Xn), and output (Yn), and our 6 coefficients 
     _a2 = 0;
     
     a0 = (1 / a0_);
-    
+
     a1 = (-1 * (a1_ * a0));
     a2 = (-1 * (a2_ * a0));
-    
+
     b0 = (b0_ * a0);
     b1 = (b1_ * a0);
     b2 = (b2_ * a0);
