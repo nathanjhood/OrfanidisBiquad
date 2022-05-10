@@ -36,7 +36,9 @@ Determining an output transfer function (Y(n)), given an input value (X(n)) and 
 
 # Creating the coefficients;
 
-First, we need to create an input (Xn), and output (Yn), and our 6 coefficients for gain multiplication, the results of which are summed together using linear addition. We can start with an arrangement that simply passes the audio sample from input to output unchanged;
+First, we need to create an input (Xn), and output (Yn), and our 6 coefficients for gain multiplication, the results of which are summed together using linear addition. We can start with an arrangement that simply passes the audio sample from input to output unchanged.
+
+Here's some pseudo-code to get us started with a template;
 
     {
     
@@ -76,7 +78,7 @@ For any readers unfamiliar with Reaktor Core, please keep in mind that signal fl
 
 *The blue macros perform a memory allocation as part of their operation, in case you were curious. This is useful for thread safety, which we have also somewhat considered within the pseudo-code (and indeed test plugin) that follows.*  
 
-Now I shall use a combination of visuals and pseudo-code to re-create and further investigate our various transformations available within the test plugin.
+Now I shall use a combination of visuals and pseudo-code as presented above to re-create and further investigate our various transformations available within the test plugin.
 
 # Direct Form I;
 
