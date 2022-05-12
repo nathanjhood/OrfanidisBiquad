@@ -10,10 +10,17 @@
             file="Res/OrfanidisBiquad.png"/>
     </GROUP>
     <GROUP id="{41624350-3ED7-0AD8-E4A9-E9E6C747C1B4}" name="Source">
+      <FILE id="RU48XX" name="OrfCoefficients.cpp" compile="1" resource="0"
+            file="Source/OrfCoefficients.cpp"/>
+      <FILE id="dEB1z0" name="OrfCoefficients.h" compile="0" resource="0"
+            file="Source/OrfCoefficients.h"/>
+      <FILE id="VNPUkj" name="ProcessorWrapper.cpp" compile="1" resource="0"
+            file="Source/ProcessorWrapper.cpp"/>
+      <FILE id="N59JDc" name="ProcessorWrapper.h" compile="0" resource="0"
+            file="Source/ProcessorWrapper.h"/>
       <FILE id="mKChb0" name="Convert.cpp" compile="1" resource="0" file="Source/Convert.cpp"/>
-      <FILE id="fLgXoG" name="Convert.h" compile="0" resource="0" file="Source/Convert.h"/>
-      <FILE id="HHZnWS" name="PeakFilter.cpp" compile="1" resource="0" file="Source/PeakFilter.cpp"/>
-      <FILE id="mT88nx" name="PeakFilter.h" compile="0" resource="0" file="Source/PeakFilter.h"/>
+      <FILE id="fLgXoG" name="Convert.h" compile="0" resource="0" file="Source/Convert.h"
+            xcodeResource="1"/>
       <FILE id="D6ssIL" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="qua56B" name="PluginProcessor.h" compile="0" resource="0"
