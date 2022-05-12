@@ -96,6 +96,12 @@ Implementation:
 
 ![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/e8a995fec9f730532160692e6f69e9800725756e/Res/DFI_core.png)
 
+* Blue cable = audio path
+
+* Red cable = feedback path
+
+* Grey cable = parameter value
+
 Pseudo-code:
 
     {
@@ -328,13 +334,13 @@ As we can observe from the above comparison, our DFII(t) structure is the most f
 
 Our DFI(t) structure performs the most poorly in the two highlighted cases - the quantization round-off error is unfavourably comparable to the DFII structure, while the four delay units contribute to heavy and unpredictable click/pop "zipper" noise underparameter modulation and also a higher memory footprint.
 
-A parameter smoother may be applied in a future version. In testing so far, it has been observed that a smoothed parameter, derived from a clock source that is likely asynchronous to the audio buffer clock, generates an unusual notch-like filter effect on the resulting audio spectrum; the deterministic frequency of this "notch-like" effect is seemingly related in periodicity to the parameter smoother's clock speed.
+A parameter smoother may be applied in a future revision. However, during testing so far, it has been observed that a smoothed parameter, derived from a clock source that is likely asynchronous to the audio buffer clock, generates an unusual notch-like filter effect on the resulting audio spectrum whilst said parameter is under modulation; the deterministic frequency of this "notch-like" effect is seemingly related in periodicity to the parameter smoother's clock speed.  For a plugin designed for real audio mixing use cases, it's good practice to apply an appropriate amount of smoothing to all ranged parameters, in most cases. For now, smoothing has intentionally *not* been applied to the plugin's parameters, as this allows us to observe the differences between the four tranforms with respect to audio-rate modulation, one of the key issues with this entire filter design.
 
-The quantization noise created by the feedback network's computational round-off errors can be seemingly entirely negated by increasing processing precision from Floats to Doubles; the resulting noise floor falls not only well below the audible threshold, but also below the reach of abilities of our testing software.
+Likewise, the quantization noise created by the feedback network's computational round-off errors can be seemingly entirely negated by increasing processing precision from Floats to Doubles; the resulting noise floor falls not only well below the audible threshold, but also below the reach of abilities of our testing software.
 
 Furthermore, increasing precision to Doubles also seemingly eradicates the "notch-like periodicity" that our parameter smoother incurrs on the waveform to imperceptible levels.
 
-However, out of sight and out of mind does not mean out the window; we are able to produce several very pronounced audible artefacts in three of the four structures when processing in Floats (commonly deemed to be a beyond acceptable processing precision for audio purposes, to be debated elsewhere). Indeed only the Transposed Direct Form II manages favourably in all cases, and thus appears to be the prime candidate transformation for Biquad-based Equalizers in all audio application contexts at the time of writing.
+However, out of sight and out of mind does not mean out the window; we are able to produce several very pronounced audible artefacts in three of the four structures when processing in Floats (commonly deemed to be a beyond acceptable processing precision for audio purposes, to be debated elsewhere). Indeed only the Transposed Direct Form II manages favourably in all cases, and thus appears to be the prime candidate transformation for Biquad-based Equalizers in all audio application contexts at the time of writing. It stands to reason that these differences in quality shall also hold true (to some degree) for processing in Doubles, although we'd be extremely unlikely to encounter these differences when processing at that level of precision, seemingly well beyond the scope of measurement of our analysis tools - especially, and most critically, our ears. 
 
 ^ Credit: Native Instruments for the Direct Form I code (taken from Reaktor 5's Core "Static Filter" library - go figure!) as well as the Core library unit delay, audio thread, and math modulation macros used here (I programmed the three other forms myself; both in Core and in C++).
 
