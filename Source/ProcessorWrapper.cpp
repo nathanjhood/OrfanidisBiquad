@@ -69,7 +69,7 @@ void ProcessWrapper<SampleType>::update()
 {
     convert.calculate(gainPtr->get(), freqPtr->get(), bandPtr->get());
 
-    coeffs.calculateCoefficients(SampleType(1.0), convert.getG(), convert.getGB(), convert.getw0(), convert.getDw());
+    coeffs.calculateCoefficients(static_cast<SampleType>(1.0), convert.getG(), convert.getGB(), convert.getw0(), convert.getDw());
 
     transform.coefficients(coeffs.b0(), coeffs.b1(), coeffs.b2(), coeffs.a0(), coeffs.a1(), coeffs.a2());
 

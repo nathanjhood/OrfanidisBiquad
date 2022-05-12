@@ -17,6 +17,7 @@
 #include "OrfanidisCalc.h"
 #include "Convert.h"
 #include "Transform.h"
+#include "OrfCoefficients.h"
 
 template <typename SampleType>
 class ProcessWrapper
@@ -62,9 +63,10 @@ private:
 
     //==============================================================================
     /** Instantiate objects. */
-    OrfanidisCalc<SampleType> coeffs;
+    //OrfanidisCalc<SampleType> coeffs;
     Conversion<SampleType> convert;
     Transformations<SampleType> transform;
+    OrfCoefficients<SampleType> coeffs;
 
     //==============================================================================
     /** Parameter objects. */
