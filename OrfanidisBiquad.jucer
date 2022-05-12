@@ -3,7 +3,7 @@
 <JUCERPROJECT id="EkUu6o" name="OrfanidisBiquad" projectType="audioplug" useAppConfig="1"
               addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
               companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest"
-              version="1.0.3">
+              version="1.0.3b.1">
   <MAINGROUP id="TFytBu" name="OrfanidisBiquad">
     <GROUP id="{FBE74690-22DE-D413-8178-F49C51EE16C3}" name="Res">
       <FILE id="asZTR5" name="OrfanidisBiquad.png" compile="0" resource="1"
