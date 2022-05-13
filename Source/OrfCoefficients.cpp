@@ -18,6 +18,27 @@ OrfCoefficients<SampleType>::OrfCoefficients()
 }
 
 template <typename SampleType>
+void OrfCoefficients<SampleType>::efg(SampleType G, SampleType GB, SampleType w0, SampleType Dw)
+{
+    const SampleType G0 = static_cast<SampleType>(1.0);
+    const SampleType G0pow2 = pow(G0);
+    const SampleType Gpow2 = pow(G);
+    const SampleType GBpow2 = pow(GB);
+    const SampleType w0pow2 = pow(w0);
+    const SampleType Dwpow2 = pow(Dw);
+    const SampleType pipow2 = pow(pi);
+
+    auto radPiTwo = powAminB(w0pow2, pipow2);
+
+    auto F = absAminB(Gpow2, GBpow2);
+    auto G00 = absAminB(Gpow2, G0pow2);
+    auto F00 = absAminB(GBpow2, G0pow2);
+
+
+
+}
+
+template <typename SampleType>
 void OrfCoefficients<SampleType>::calculateCoefficients(SampleType G0, SampleType G, SampleType GB, SampleType w0, SampleType Dw)
 {
     if (G == GB)

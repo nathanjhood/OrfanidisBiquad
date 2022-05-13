@@ -73,6 +73,8 @@ public:
     }
 
     //==============================================================================
+    void efg(SampleType G, SampleType GB, SampleType w0, SampleType Dw);
+
     void calculateCoefficients(SampleType G0, SampleType G, SampleType GB, SampleType w0, SampleType Dw);
 
 private:
