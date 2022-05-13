@@ -72,6 +72,8 @@ I have also re-created all of the code from this study in my preferred visual-pr
 
 ![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
 
+For any Reaktor Core builders in attendance - you will see some structures in this write-up that are not in accordance with Reaktor Core's processing paradigm, particularly with respect to feedback macros and handling. The writer has assumed that readers have (practically) no interest in Reaktor Core itself, and are primarily here for the theory and possibly the C code. Thus, I have intentionally mis-used Reaktor's feedback handling purely for the sake of the visual demonstrations ahead, which I believe are very clear, even for non-Reaktor users. To create safe versions of these macros, please use the factory "z-1fdbk" non-solid macro for all unit delays, and ideally add an SR bundle distribution.
+
 For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the basic math operators connecting inputs to outputs (grey), we have a few macros (blue) that may raise queries - this symbol legend may help fill in a few blanks;
 
 ![legend](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Legend%20(coded%20by%20StoneyDSP).png)
@@ -250,7 +252,7 @@ Pseudo-code:
 
 Notes:
 
-The transposed Direct Form I ("DFI(t)") utilizes the four unit-delays of it's predecessor, meaning instability while passing audio during parameter modulation, while it *also* incurs the exact same "round-off error" and quantization noise as the original DFII structure. This is a dangerous combination for real-world audio use-cases, such as a mixing scenario.
+The transposed Direct Form I ("DFI(t)") utilizes the four unit-delays of it's predecessor, meaning a higher memory footprint, while it *also* incurs the exact same "round-off error" and quantization noise as the original DFII structure. This is a dangerous combination for real-world audio use-cases, such as a mixing scenario.
 
 So far, we've encountered one transformation resulting in zipper noise, one resulting in quantization noise, and one resulting in *both*.
 
