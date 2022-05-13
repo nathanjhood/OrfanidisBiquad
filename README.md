@@ -80,7 +80,7 @@ I have also re-created all of the code from this study in my preferred visual-pr
 
 ![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
 
-For any Reaktor Core builders in attendance - you will see some structures in this write-up that are not in accordance with Reaktor Core's processing paradigm, particularly with respect to feedback macros and handling. The writer has assumed that readers have (practically) no interest in Reaktor Core itself, and are primarily here for the theory and possibly the C code. Thus, I have intentionally mis-used Reaktor's feedback handling purely for the sake of the visual demonstrations ahead, which I believe are very clear, even for non-Reaktor users. To create safe versions of these macros, please use the factory "z-1fdbk" non-solid macro for all unit delays, and ideally add an SR bundle distribution.
+For any Reaktor Core builders in attendance - you will see some structures in this write-up that are not in accordance with Reaktor Core's processing paradigm, particularly with respect to feedback macros and handling. The writer has assumed that readers have (practically) no interest in Reaktor Core itself, and are primarily here for the theory and possibly the C code. Thus, I have intentionally mis-used Reaktor's feedback handling purely for the sake of the visual demonstrations ahead, which I believe are very clear, even for non-Reaktor users. To create safe versions of these macros, please use the *non-solid* factory "z-1 fdbk" macro for all unit delays, and ideally add an SR bundle distribution.
 
 For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the basic math operators connecting inputs to outputs (grey), we have a few macros (blue) that may raise queries - this symbol legend may help fill in a few blanks;
 
@@ -345,9 +345,9 @@ Furthermore, we might want to consider how our coefficient calculations are bein
 
 As a slight abstraction, we can imagine that both "b2" and "a1" gain coefficients are updated simultaneously by our "Q" parameter on the GUI. Perhaps, one is the perfect inverse of the other; 
 
-when "b2 = 1, a2= -1", 
+when "b2 = 1, a1= -1", 
 
-just as when "a2 = -0.5, b2 = 0.5", 
+just as when "a1 = -0.5, b2 = 0.5", 
 
 ...and so on. 
 
@@ -359,7 +359,7 @@ We can easily see that in the latter case, our gain calcuations are being applie
 
 So, what happens in either case when we update our "Q" parameter from the GUI, when b2 and a2 should travel in a perfectly complimentary fashion? Do they still converge upon complimentary numbers at the exact same time, considered on a sample-by-sample basis, with all these unit delays in their respective paths?
 
-What if b2 moves and is applied via a single unit delay, while a2 takes an additional unit delay in it's path? Their respective numbers will no longer correspond in their intended fashion - b1 might move from, say, 1.0 to it's final value of 0.5, while a1 does both operations a single sample later, meaning that for the period of a single sample, our coefficients no longer converge upon the previously-specified algorithm's intended output values.
+What if b2 moves and is applied via a single unit delay, while a1 takes an additional unit delay in it's path? Their respective numbers will no longer correspond in their intended fashion - b2 might move from, say, 1.0 to it's final value of 0.5, while a1 does both operations a single sample later, meaning that for the period of a single sample, our coefficients no longer converge upon the previously-specified algorithm's intended output values.
 
 Thus, the levels of positive- and negative- gain within our structure may become completely unpredictable when modulated in real-time, causing completely unpredictable (and dangerously explosive) sonic results. This is clearly to be avoided at all costs in any real-world listening environment, which renders it rather useless for an audio application...!
 
