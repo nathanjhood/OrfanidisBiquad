@@ -1,9 +1,9 @@
 # OrfanidisBiquad
 Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
 
-(Shown below; a +30dB bell-shaped boost at 10kHz, performed on a harmonic-rich 20Hz sawtooth-wave in Reaper)
+(Shown below; a +30dB bell-shaped boost at 10kHz, performed on a harmonic-rich 20Hz band-limited Impulse Response in Reaper)
 
-![Orfanidis Biquad](Res/OrfanidisBiquad.png)
+![Orfanidis Biquad](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/OrfOnBlit.png)
 
 
 (write-up and comparisons to follow - currently under revision)
@@ -198,11 +198,13 @@ Pseudo-code:
 
 Notes:
 
-DFII, using less unit delays in it's architecture, produces much less significant artefacts during parameter modulation; in all but the most extreme cases, the output remains relatively benign. However, this structure is far more prone to "round-off" errors due to a narrowing computational precision in certain parts of the feedback network; this can manifest as a kind of "quantization noise" - much like un-dithered fixed-point audio - creeping well into the audible range, and in some cases enveloping low-amplitudinal parts of the input signal. This can be particularly extenuated by very large boosts of a tight "bell" shape in the lowest bass frequencies, causing strong quantization-error noise to permeate the upper-mid and treble ranges of the signal (image to follow).
+DFII, using less unit delays in it's architecture, produces much less significant artefacts during parameter modulation; in all but the most extreme cases, the output remains relatively benign. However, this structure is far more prone to "round-off" errors due to a narrowing computational precision in certain parts of the feedback network; this can manifest as a kind of "quantization noise" - much like un-dithered fixed-point audio - creeping well into the audible range, and in some cases enveloping low-amplitudinal parts of the input signal. This can be particularly extenuated by very large boosts of a tight "bell" shape in the lowest bass frequencies, causing strong quantization-error noise to permeate the upper-mid and treble ranges of the signal (image below).
+
+![Quantization Noise](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/QuantizedNoise.png)
 
 # Direct Form I Transposed;
 
-For the "transposed" forms, all terms are inverted (signal flow reversed, summing points become split points, and multpiliers swap positions), creating the same output transfer function for the same number of components but in a somewhat "mirrored" directional flow of our input signal, resulting in our coefficient multiplactions occuring *before* the unit delays;
+For the "transposed" forms, all terms are inverted (signal flow reversed, summing points become split points, and multpiliers swap positions), creating the same output transfer function for the same number of components but in a somewhat "mirrored" directional flow of our input signal, resulting in our coefficient multiplications occuring *before* the unit delays;
 
 Flow diagram:
 
@@ -350,8 +352,8 @@ Likewise, the quantization noise created by the feedback network's computational
 
 However, out of sight and out of mind does not mean out the window; we are able to produce several very pronounced audible artefacts in three of the four structures when processing in Floats (commonly deemed to be a beyond acceptable processing precision for audio purposes, to be debated elsewhere). Indeed only the Transposed Direct Form II manages favourably in all cases, and thus appears to be the prime candidate transformation for Biquad-based Equalizers in all audio application contexts at the time of writing. It stands to reason that these differences in quality shall also hold true (to some degree) for processing in Doubles, although we'd be extremely unlikely to encounter these differences when processing at that level of precision, seemingly well beyond the scope of measurement of our analysis tools - especially, and most critically, our ears. 
 
-^ Credit: Native Instruments for the Direct Form I code (taken from Reaktor 5's Core "Static Filter" library - go figure!) as well as the Core library unit delay, audio thread, and math modulation macros used here (I programmed the three other forms myself; both in Core and in C++).
-
 - Nathan Hood (StoneyDSP), May 2022.
 
-^^ Reference: Transformations images taken from: https://en.wikipedia.org/wiki/Digital_biquad_filter
+^ Credit: Native Instruments for the Direct Form I code (taken from Reaktor 5's Core "Static Filter" library - go figure!) as well as the Core library unit delay, audio thread, and math modulation macros used here (I programmed the three other forms myself; both in Core and in C++).
+
+^^ Reference: "Transformations" and "Calculus" images taken from: https://en.wikipedia.org/wiki/Digital_biquad_filter
