@@ -202,6 +202,8 @@ DFII, using less unit delays in it's architecture, produces much less significan
 
 ![Quantization Noise](https://github.com/StoneyDSP/OrfanidisBiquad/blob/d19bfc6f85a9e8c421482b100453a12288be7cb8/Res/QuantizedNoiseEdit.png)
 
+*(Shown above: +30dB boost at 20hz with Bandwidth of 1.0 using DFII, on a 20hz Sawtooth waveform)
+
 # Direct Form I Transposed;
 
 For the "transposed" forms, all terms are inverted (signal flow reversed, summing points become split points, and multpiliers swap positions), creating the same output transfer function for the same number of components but in a somewhat "mirrored" directional flow of our input signal, resulting in our coefficient multiplications occuring *before* the unit delays;
@@ -316,6 +318,10 @@ Pseudo-code:
 Notes:
 
 The Transposed Direct Form II, similarly to it's predecessor, uses only two unit-delays, making it much more amenable to audio-rate modulation; meanwhile, this form also successfully manages to avoid the higher "round-off" error and quantization noise of it's predecessor (and the DFI(t) structure).
+
+![NoiseGone](https://github.com/StoneyDSP/OrfanidisBiquad/blob/f127d5abe3a13265b05380a2550df118eb131466/Res/NoNoise.png)
+
+*(Shown above: +30dB boost at 20hz with Bandwidth of 1.0 using DFII(t), on a 20hz Sawtooth waveform)
 
 # Observations and comparisons;
 
