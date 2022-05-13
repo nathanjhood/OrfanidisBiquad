@@ -1,3 +1,11 @@
+v.1.0.3b.1
+To be done:
++ Implement safe "Floats/Doubles" switching parameter (if possible?)
++ Implement switchable "RBJ" and "ORF" coefficient calculations
++ Add second filter band, following same coeff & transform types as the first filter band, but independent freq, gain, Q and IO params
++ Param smoother "notch-like" artefacts - images to follow
++ Finish write up and begin on "de-cramped 1st-order filters via four transforms" (under construction)...
+
 # OrfanidisBiquad
 Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
 
