@@ -92,7 +92,7 @@ Now I shall use a combination of visuals and pseudo-code as presented above to r
 
 # Direct Form I;
 
-Direct Form I is characterized by having a total four unit delays present within it's architecture, with two coefficients (a1 and a2) arranged as to control negative feedback gain, and the remaining three (b0 to b2) controlling positive feedback gain, with all feedback terms summed (added) together in a simple linear fashion;  
+Direct Form I is characterized by having a total four unit delays present within it's architecture, with two coefficients (a1 and a2) arranged as to control negative coefficient gain (thus inverting the corresponding signal), and the remaining three (b0 to b2) controlling positive coefficient gain, with all feedback terms summed (added) together in a simple linear fashion;  
 
 Calculus:
 
@@ -106,9 +106,9 @@ Implementation:
 
 ![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/e8a995fec9f730532160692e6f69e9800725756e/Res/DFI_core.png)
 
-* Blue cable = audio path
+* Blue cable = positive coeffiecient audio path
 
-* Red cable = feedback path
+* Red cable = negative ceofficient audio path
 
 * Grey cable = parameter value
 
@@ -340,6 +340,32 @@ The two "transposed" forms provide us the same output characteristics for the sa
 This transposition places our coefficient multipliers *before* our unit delays, instead of after them.
 
 I have seen some texts which provide several insights into what this change means with regards to our system stability and performance; one particularly intriguing which suggests that the transposed arrangements cause the unit delays (assumedly at their concurrent point of summation) act as a kind of smoother between changed values - perhaps very much like a single-pole low-pass filter? Another consideration might be the precision of our unit delays - let us imagine, for a moment, that our unit delays were operating at a lowly 16-bit fixed point arithmetic, causing truncation of the lowest bit ("least significant bit") of the audio data that we feed it. If we were to pipe our audio into our low-precision unit delay with a very low gain value (for example, we multiply by 0.0625 on the way in), and then compensate with a corresponding gain boost on the way out, we will have lost several bits of the "least significant part" of our audio to the low-precision unit delay. By contrast, if we were instead to pipe our audio into the unit delay at *unity* gain and then simply scale it to the appropriate level afterward, this gain scaling (coming after the unit-delay's truncation happens) does *not* affect our audio precision at all; any loss of "least significant" data going into the unit-delay has already happened before this scaling occurs.
+
+Furthermore, we might want to consider how our coefficient calculations are being applied to the input signal "across time", on a sample-by-sample basis. This is where the relationship order of gain multiplier and unit delay becomes very important; if we consider that a single parameter, such as our "Q" control (adjusting our filter's bandwidth) is in fact updating several of our coefficient multipliers "simultaneously" by itself, then at what point in time do these various coefficient updates get applied to our audio stream?
+
+As a slight abstraction, we can imagine that both "b2" and "a1" gain coefficients are updated simultaneously by our "Q" parameter on the GUI. Perhaps, one is the perfect inverse of the other; 
+
+when "b2 = 1, a2= -1", 
+
+just as when "a2 = -0.5, b2 = 0.5", 
+
+...and so on. 
+
+They are moving in perfectly complementary values at all times, instantaneously. So then what's the issue?
+
+Well, what about our unit delays? Where are they placed within the path to to our audio stream? We can see that we have some instances in our various transformation types in which our gain multipliers are placed *before* the unit delays, and some structures which place the gain multipliers *after* the unit delays.
+
+We can easily see that in the latter case, our gain calcuations are being applied *instantaneously* - that is, none of the calculation results are going through any unit delays. However, with the former, we see our gain calculations are infact "spread across time" by the various steps of unit delays in their paths.
+
+So, what happens in either case when we update our "Q" parameter from the GUI, when b2 and a2 should travel in a perfectly complimentary fashion? Do they still converge upon complimentary numbers at the exact same time, considered on a sample-by-sample basis, with all these unit delays in their respective paths?
+
+What if b2 moves and is applied via a single unit delay, while a2 takes an additional unit delay in it's path? Their respective numbers will no longer correspond in their intended fashion - b1 might move from, say, 1.0 to it's final value of 0.5, while a1 does both operations a single sample later, meaning that for the period of a single sample, our coefficients no longer converge upon the previously-specified algorithm's intended output values.
+
+Thus, the levels of positive- and negative- gain within our structure may become completely unpredictable when modulated in real-time, causing completely unpredictable (and dangerously explosive) sonic results. This is clearly to be avoided at all costs in any real-world listening environment, which renders it rather useless for an audio application...!
+
+This concept occured to the writer when considering whether applying smoothers to the coefficients b0 through a2 *themeselves* might combat some of the real-time modulation issues previously encountered. However, simply following the logic above, this idea would almost certainly make any of the transform structure completely unstable, causing more damage than good.
+
+We can therefore conclude; It seems there are some quite terminal arguements for avoiding transformation structures that do not apply their gain coefficients simultaneously upon the audio path.
 
 Of course, our circuit is much more complicated than this, especially as the number of poles (and zeros) grows - but these outlined concepts might at least help us gain some bearings on *why* these real-time performance differences arise between supposedly equal circuits.
 
