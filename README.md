@@ -200,7 +200,7 @@ Notes:
 
 DFII, using less unit delays in it's architecture, produces much less significant artefacts during parameter modulation; in all but the most extreme cases, the output remains relatively benign. However, this structure is far more prone to "round-off" errors due to a narrowing computational precision in certain parts of the feedback network; this can manifest as a kind of "quantization noise" - much like un-dithered fixed-point audio - creeping well into the audible range, and in some cases enveloping low-amplitudinal parts of the input signal. This can be particularly extenuated by very large boosts of a tight "bell" shape in the lowest bass frequencies, causing strong quantization-error noise to permeate the upper-mid and treble ranges of the signal (image below).
 
-![Quantization Noise](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/QuantizedNoise.png)
+![Quantization Noise](https://github.com/StoneyDSP/OrfanidisBiquad/blob/d19bfc6f85a9e8c421482b100453a12288be7cb8/Res/QuantizedNoiseEdit.png)
 
 # Direct Form I Transposed;
 
