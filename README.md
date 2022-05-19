@@ -1,18 +1,24 @@
 v.1.0.3b.1
+
+# OrfanidisBiquad
+Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
+
++ Under construction (working but under development - please see "issues")!
++ Implementing a two-pole peak filter (hopefully more filter types to come), using variable BiLinear transforms and switchable processing precision, to achieve high-quality results!
++ This filter is *not* subject to amplitude and phase warping of the frequency spectrum, even without the use of oversampling.
++ There is currently no parameter smoothing, so BE AWARE that modulating parameters in real-time WILL create loud clicks and pops while passing audio under many settings.
++ Please see my "Biquads" repository for further information meanwhile.
+
+(Shown below; a +30dB bell-shaped boost at 10kHz, performed on a harmonic-rich 20Hz band-limited Impulse Response in Reaper)
+
+![Orfanidis Biquad](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/OrfOnBlit.png)
+
 To be done:
 + Implement safe "Floats/Doubles" switching parameter (if possible?)
 + Implement switchable "RBJ" and "ORF" coefficient calculations
 + Add second filter band, following same coeff & transform types as the first filter band, but independent freq, gain, Q and IO params
 + Param smoother "notch-like" artefacts - images to follow
 + Finish write up and begin on "de-cramped 1st-order filters via four transforms" (under construction)...
-
-# OrfanidisBiquad
-Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
-
-(Shown below; a +30dB bell-shaped boost at 10kHz, performed on a harmonic-rich 20Hz band-limited Impulse Response in Reaper)
-
-![Orfanidis Biquad](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/OrfOnBlit.png)
-
 
 (write-up and comparisons to follow - currently under revision)
 
