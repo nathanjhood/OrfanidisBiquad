@@ -14,11 +14,9 @@
 #define PROCESSORWRAPPER_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-//#include "OrfanidisCalc.h"
 #include "Convert.h"
 #include "Transform.h"
 #include "OrfCoefficients.h"
-//#include "Biquads.h"
 
 template <typename SampleType>
 class ProcessWrapper

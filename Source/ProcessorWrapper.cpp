@@ -13,19 +13,19 @@
 template <typename SampleType>
 ProcessWrapper<SampleType>::ProcessWrapper(juce::AudioProcessorValueTreeState& apvts)
 {
-    ioPtr = dynamic_cast                <juce::AudioParameterBool*>         (apvts.getParameter("ioID"));
+    ioPtr = static_cast                <juce::AudioParameterBool*>         (apvts.getParameter("ioID"));
     jassert(ioPtr != nullptr);
 
-    frequencyPtr = dynamic_cast         <juce::AudioParameterFloat*>        (apvts.getParameter("frequencyID"));
+    frequencyPtr = static_cast         <juce::AudioParameterFloat*>        (apvts.getParameter("frequencyID"));
     jassert(frequencyPtr != nullptr);
 
-    resonancePtr = dynamic_cast         <juce::AudioParameterFloat*>        (apvts.getParameter("resonanceID"));
+    resonancePtr = static_cast         <juce::AudioParameterFloat*>        (apvts.getParameter("resonanceID"));
     jassert(resonancePtr != nullptr);
 
-    gainPtr = dynamic_cast              <juce::AudioParameterFloat*>        (apvts.getParameter("gainID"));
+    gainPtr = static_cast              <juce::AudioParameterFloat*>        (apvts.getParameter("gainID"));
     jassert(gainPtr != nullptr);
 
-    transformPtr = dynamic_cast         <juce::AudioParameterChoice*>       (apvts.getParameter("transformID"));
+    transformPtr = static_cast         <juce::AudioParameterChoice*>       (apvts.getParameter("transformID"));
     jassert(transformPtr != nullptr);
 }
 
@@ -93,8 +93,6 @@ void ProcessWrapper<SampleType>::update()
     coeffs.calculateCoefficients(static_cast<SampleType>(1.0), convert.getG(), convert.getGB(), convert.getw0(), convert.getDw());
 
     transform.coefficients(coeffs.b0(), coeffs.b1(), coeffs.b2(), coeffs.a0(), coeffs.a1(), coeffs.a2());
-
-    //transform.setTransformType(transformPtr);
 
     if (transformPtr->getIndex() == 0)
         transform.setTransformType(TransformationType::directFormI);
