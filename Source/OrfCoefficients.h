@@ -73,6 +73,10 @@ public:
     }
 
     //==============================================================================
+    SampleType numerator(SampleType G0pow2, SampleType radPiPow, SampleType Gpow2, SampleType F00, SampleType pipow2, SampleType Dwpow2, SampleType F);
+
+    SampleType denominator(SampleType radPiPow, SampleType F00, SampleType pipow2, SampleType Dwpow2, SampleType F);
+
     void efg(SampleType G, SampleType GB, SampleType w0, SampleType Dw);
 
     void calculateCoefficients(SampleType G0, SampleType G, SampleType GB, SampleType w0, SampleType Dw);

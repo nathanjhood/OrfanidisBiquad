@@ -18,9 +18,26 @@ OrfCoefficients<SampleType>::OrfCoefficients()
 }
 
 template <typename SampleType>
+SampleType OrfCoefficients<SampleType>::numerator(SampleType G0pow2, SampleType radPiPow, SampleType Gpow2, SampleType F00, SampleType pipow2, SampleType Dwpow2, SampleType F)
+{
+    return (G0pow2 * pow(radPiPow) + Gpow2 * F00 * pipow2 * Dwpow2 / F);
+}
+
+template <typename SampleType>
+SampleType OrfCoefficients<SampleType>::denominator(SampleType radPiPow, SampleType F00, SampleType pipow2, SampleType Dwpow2, SampleType F)
+{
+    return (radPiPow + F00 * pipow2 * Dwpow2 / F);
+}
+
+template <typename SampleType>
 void OrfCoefficients<SampleType>::efg(SampleType G, SampleType GB, SampleType w0, SampleType Dw)
 {
-    const SampleType G0 = static_cast<SampleType>(1.0);
+    juce::ignoreUnused(G);
+    juce::ignoreUnused(GB);
+    juce::ignoreUnused(w0);
+    juce::ignoreUnused(Dw);
+
+    /*const SampleType G0 = static_cast<SampleType>(1.0);
     const SampleType G0pow2 = pow(G0);
     const SampleType Gpow2 = pow(G);
     const SampleType GBpow2 = pow(GB);
@@ -32,9 +49,7 @@ void OrfCoefficients<SampleType>::efg(SampleType G, SampleType GB, SampleType w0
 
     auto F = absAminB(Gpow2, GBpow2);
     auto G00 = absAminB(Gpow2, G0pow2);
-    auto F00 = absAminB(GBpow2, G0pow2);
-
-
+    auto F00 = absAminB(GBpow2, G0pow2);*/
 
 }
 
@@ -69,6 +84,8 @@ void OrfCoefficients<SampleType>::calculateCoefficients(SampleType G0, SampleTyp
         const SampleType den = pow(radPiPow) + F00 * pipow2 * Dwpow2 / F;
 
         const SampleType G1 = sqrtAdivB(num, den);
+        //const SampleType G1 = sqrtAdivB(numerator(G0pow2, radPiPow, Gpow2, F00, pipow2, Dwpow2, F), denominator(radPiPow, F00, pipow2, Dwpow2, F));
+        //const SampleType G1 = sqrtAdivB(numerator(G0pow2, radPiPow, Gpow2, F00, pipow2, Dwpow2, F), denominator((pow(radPiPow)), F00, pipow2, Dwpow2, F));
         const SampleType G1pow2 = pow(G1);
 
         const SampleType G01 = absAminB(Gpow2, (G0*G1));
