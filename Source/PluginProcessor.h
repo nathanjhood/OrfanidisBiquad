@@ -70,23 +70,19 @@ public:
 private:
 
     //==============================================================================
-    /** Updates the internal state variables of the processor. */
     void update();
 
     //==============================================================================
     /** Audio processor members. */
-    juce::dsp::ProcessSpec spec;
     ProcessWrapper<float> processor{ (apvts) };
 
     //==============================================================================
     /** Parameter pointers. */
     juce::AudioParameterBool* bitsPtr{ nullptr };
     juce::AudioParameterBool* bypPtr{ nullptr };
-    juce::AudioParameterChoice* transPtr{ nullptr };
 
     //==============================================================================
     /** Init variables. */
-
     double ramp = 0.0001;
 
 

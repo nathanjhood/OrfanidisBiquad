@@ -24,9 +24,6 @@ OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
 
     bypPtr = dynamic_cast       <juce::AudioParameterBool*>    (apvts.getParameter("bypassID"));
     jassert(bypPtr != nullptr);
-
-    transPtr = dynamic_cast      <juce::AudioParameterChoice*>   (apvts.getParameter("transID"));
-    jassert(transPtr != nullptr);
 }
 
 OrfanidisBiquadAudioProcessor::~OrfanidisBiquadAudioProcessor()
@@ -44,11 +41,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout OrfanidisBiquadAudioProcesso
 
     ProcessWrapper<float>::createParameterLayout(params);
 
-    auto tString = juce::StringArray({ "Direct Form I", "Direct Form II", "Direct Form I (t)", "Direct Form II (t)" });
-
     params.push_back(std::make_unique<juce::AudioParameterBool>("bitsID", "Doubles", false));
     params.push_back(std::make_unique<juce::AudioParameterBool>("bypassID", "Bypass", false));
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("transID", "Transform", tString, 3));
     
     return { params.begin(), params.end() };
 }
@@ -133,11 +127,8 @@ void OrfanidisBiquadAudioProcessor::changeProgramName (int index, const juce::St
 void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     getProcessingPrecision();
-    spec.sampleRate = sampleRate;
-    spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = getTotalNumOutputChannels();
 
-    processor.prepare(spec);
+    processor.prepare(sampleRate, samplesPerBlock, getTotalNumInputChannels());
     processor.reset();
 }
 
@@ -148,17 +139,9 @@ void OrfanidisBiquadAudioProcessor::releaseResources()
 
 void OrfanidisBiquadAudioProcessor::update()
 {
-    bypPtr->get();
     bitsPtr->get();
+    bypPtr->get();
     
-    if (transPtr->getIndex() == 0)
-        processor.transType(TransformationType::dfI);
-    else if (transPtr->getIndex() == 1)
-        processor.transType(TransformationType::dfII);
-    else if (transPtr->getIndex() == 2)
-        processor.transType(TransformationType::dfIt);
-    else if (transPtr->getIndex() == 3)
-        processor.transType(TransformationType::dfIIt);
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
