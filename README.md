@@ -1,18 +1,24 @@
 v.1.0.3b.1
+
+# OrfanidisBiquad
+Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
+
++ Under construction (working but under development - please see "issues")!
++ Implementing a two-pole peak filter (hopefully more filter types to come), using variable BiLinear transforms and switchable processing precision, to achieve high-quality results!
++ This filter is *not* subject to amplitude and phase warping of the frequency spectrum, even without the use of oversampling.
++ There is currently no parameter smoothing, so BE AWARE that modulating parameters in real-time WILL create loud clicks and pops while passing audio under many settings.
++ Please see my "Biquads" repository for further information meanwhile.
+
+(Shown below; a +30dB bell-shaped boost at 10kHz, performed on a harmonic-rich 20Hz band-limited Impulse Response in Reaper)
+
+![Orfanidis Biquad](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/OrfOnBlit.png)
+
 To be done:
 + Implement safe "Floats/Doubles" switching parameter (if possible?)
 + Implement switchable "RBJ" and "ORF" coefficient calculations
 + Add second filter band, following same coeff & transform types as the first filter band, but independent freq, gain, Q and IO params
 + Param smoother "notch-like" artefacts - images to follow
 + Finish write up and begin on "de-cramped 1st-order filters via four transforms" (under construction)...
-
-# OrfanidisBiquad
-Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
-
-(Shown below; a +30dB bell-shaped boost at 10kHz, performed on a harmonic-rich 20Hz band-limited Impulse Response in Reaper)
-
-![Orfanidis Biquad](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/OrfOnBlit.png)
-
 
 (write-up and comparisons to follow - currently under revision)
 
@@ -80,7 +86,7 @@ I have also re-created all of the code from this study in my preferred visual-pr
 
 ![Workbench](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0a9c1168752616b455d68b52a2b0b841102dfa16/Res/Workbench%20-%20Bypass%20(coded%20by%20StoneyDSP).png)
 
-For any Reaktor Core builders in attendance - you will see some structures in this write-up that are not in accordance with Reaktor Core's processing paradigm, particularly with respect to feedback macros and handling. The writer has assumed that readers have (practically) no interest in Reaktor Core itself, and are primarily here for the theory and possibly the C code. Thus, I have intentionally mis-used Reaktor's feedback handling purely for the sake of the visual demonstrations ahead, which I believe are very clear, even for non-Reaktor users. To create safe versions of these macros, please use the factory "z-1fdbk" non-solid macro for all unit delays, and ideally add an SR bundle distribution.
+For any Reaktor Core builders in attendance - you will see some structures in this write-up that are not in accordance with Reaktor Core's processing paradigm, particularly with respect to feedback macros and handling. The writer has assumed that readers have (practically) no interest in Reaktor Core itself, and are primarily here for the theory and possibly the C code. Thus, I have intentionally mis-used Reaktor's feedback handling purely for the sake of the visual demonstrations ahead, which I believe are very clear, even for non-Reaktor users. To create safe versions of these macros, please use the *non-solid* factory "z-1 fdbk" macro for all unit delays, and ideally add an SR bundle distribution.
 
 For any readers unfamiliar with Reaktor Core, please keep in mind that signal flows from left (input) to right (output). In addition to the basic math operators connecting inputs to outputs (grey), we have a few macros (blue) that may raise queries - this symbol legend may help fill in a few blanks;
 
@@ -92,7 +98,7 @@ Now I shall use a combination of visuals and pseudo-code as presented above to r
 
 # Direct Form I;
 
-Direct Form I is characterized by having a total four unit delays present within it's architecture, with two coefficients (a1 and a2) arranged as to control negative feedback gain, and the remaining three (b0 to b2) controlling positive feedback gain, with all feedback terms summed (added) together in a simple linear fashion;  
+Direct Form I is characterized by having a total four unit delays present within it's architecture, with two coefficients (a1 and a2) arranged as to control negative coefficient gain (thus inverting the corresponding signal), and the remaining three (b0 to b2) controlling positive coefficient gain, with all feedback terms summed (added) together in a simple linear fashion;  
 
 Calculus:
 
@@ -106,9 +112,9 @@ Implementation:
 
 ![Direct Form I core](https://github.com/StoneyDSP/OrfanidisBiquad/blob/e8a995fec9f730532160692e6f69e9800725756e/Res/DFI_core.png)
 
-* Blue cable = audio path
+* Blue cable = positive coeffiecient audio path
 
-* Red cable = feedback path
+* Red cable = negative ceofficient audio path
 
 * Grey cable = parameter value
 
@@ -340,6 +346,32 @@ The two "transposed" forms provide us the same output characteristics for the sa
 This transposition places our coefficient multipliers *before* our unit delays, instead of after them.
 
 I have seen some texts which provide several insights into what this change means with regards to our system stability and performance; one particularly intriguing which suggests that the transposed arrangements cause the unit delays (assumedly at their concurrent point of summation) act as a kind of smoother between changed values - perhaps very much like a single-pole low-pass filter? Another consideration might be the precision of our unit delays - let us imagine, for a moment, that our unit delays were operating at a lowly 16-bit fixed point arithmetic, causing truncation of the lowest bit ("least significant bit") of the audio data that we feed it. If we were to pipe our audio into our low-precision unit delay with a very low gain value (for example, we multiply by 0.0625 on the way in), and then compensate with a corresponding gain boost on the way out, we will have lost several bits of the "least significant part" of our audio to the low-precision unit delay. By contrast, if we were instead to pipe our audio into the unit delay at *unity* gain and then simply scale it to the appropriate level afterward, this gain scaling (coming after the unit-delay's truncation happens) does *not* affect our audio precision at all; any loss of "least significant" data going into the unit-delay has already happened before this scaling occurs.
+
+Furthermore, we might want to consider how our coefficient calculations are being applied to the input signal "across time", on a sample-by-sample basis. This is where the relationship order of gain multiplier and unit delay becomes very important; if we consider that a single parameter, such as our "Q" control (adjusting our filter's bandwidth) is in fact updating several of our coefficient multipliers "simultaneously" by itself, then at what point in time do these various coefficient updates get applied to our audio stream?
+
+As a slight abstraction, we can imagine that both "b2" and "a1" gain coefficients are updated simultaneously by our "Q" parameter on the GUI. Perhaps, one is the perfect inverse of the other; 
+
+when "b2 = 1, a1= -1", 
+
+just as when "a1 = -0.5, b2 = 0.5", 
+
+...and so on. 
+
+They are moving in perfectly complementary values at all times, instantaneously. So then what's the issue?
+
+Well, what about our unit delays? Where are they placed within the path to to our audio stream? We can see that we have some instances in our various transformation types in which our gain multipliers are placed *before* the unit delays, and some structures which place the gain multipliers *after* the unit delays.
+
+We can easily see that in the latter case, our gain calcuations are being applied *instantaneously* - that is, none of the calculation results are going through any unit delays. However, with the former, we see our gain calculations are infact "spread across time" by the various steps of unit delays in their paths.
+
+So, what happens in either case when we update our "Q" parameter from the GUI, when b2 and a2 should travel in a perfectly complimentary fashion? Do they still converge upon complimentary numbers at the exact same time, considered on a sample-by-sample basis, with all these unit delays in their respective paths?
+
+What if b2 moves and is applied via a single unit delay, while a1 takes an additional unit delay in it's path? Their respective numbers will no longer correspond in their intended fashion - b2 might move from, say, 1.0 to it's final value of 0.5, while a1 does both operations a single sample later, meaning that for the period of a single sample, our coefficients no longer converge upon the previously-specified algorithm's intended output values.
+
+Thus, the levels of positive- and negative- gain within our structure may become completely unpredictable when modulated in real-time, causing completely unpredictable (and dangerously explosive) sonic results. This is clearly to be avoided at all costs in any real-world listening environment, which renders it rather useless for an audio application...!
+
+This concept occured to the writer when considering whether applying smoothers to the coefficients b0 through a2 *themeselves* might combat some of the real-time modulation issues previously encountered. However, simply following the logic above, this idea would almost certainly make any of the transform structure completely unstable, causing more damage than good.
+
+We can therefore conclude; It seems there are some quite terminal arguements for avoiding transformation structures that do not apply their gain coefficients simultaneously upon the audio path.
 
 Of course, our circuit is much more complicated than this, especially as the number of poles (and zeros) grows - but these outlined concepts might at least help us gain some bearings on *why* these real-time performance differences arise between supposedly equal circuits.
 
