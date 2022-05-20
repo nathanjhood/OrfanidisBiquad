@@ -14,10 +14,11 @@
 #define PROCESSORWRAPPER_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "OrfanidisCalc.h"
+//#include "OrfanidisCalc.h"
 #include "Convert.h"
 #include "Transform.h"
 #include "OrfCoefficients.h"
+//#include "Biquads.h"
 
 template <typename SampleType>
 class ProcessWrapper
@@ -28,33 +29,18 @@ public:
     ProcessWrapper(juce::AudioProcessorValueTreeState& apvts);
 
     //==============================================================================
+    /** Create Parameter Layout. */
+    static void createParameterLayout(std::vector<std::unique_ptr<RangedAudioParameter>>& params);
+
+    //==============================================================================
     /** Initialises the processor. */
-    void prepare(juce::dsp::ProcessSpec& spec);
+    void prepare(double sampleRate, int samplesPerBlock, int numChannels);
 
     /** Resets the internal state variables of the processor. */
     void reset();
 
     //==============================================================================
-    void process(juce::AudioBuffer<SampleType>& buffer, juce::MidiBuffer& midiMessages)
-    {
-        juce::ignoreUnused(midiMessages);
-
-        update();
-
-        juce::dsp::AudioBlock<SampleType> block (buffer);
-        juce::dsp::ProcessContextReplacing<SampleType> context (block);
-
-        if (ioPtr->get() == true)
-            context.isBypassed = true;
-        else
-            context.isBypassed = false;
-
-        transform.process(context);
-    };
-
-    static void createParameterLayout(std::vector<std::unique_ptr<RangedAudioParameter>>& params);
-
-    void transType(TransformationType newTransform);
+    void process(juce::AudioBuffer<SampleType>& buffer, juce::MidiBuffer& midiMessages);
 
 private:
     //==============================================================================
@@ -63,7 +49,7 @@ private:
 
     //==============================================================================
     /** Instantiate objects. */
-    //OrfanidisCalc<SampleType> coeffs;
+    juce::dsp::ProcessSpec spec;
     Conversion<SampleType> convert;
     Transformations<SampleType> transform;
     OrfCoefficients<SampleType> coeffs;
@@ -77,14 +63,11 @@ private:
 
     //==============================================================================
     /** Parameter pointers. */
-    juce::AudioParameterBool* ioPtr{ nullptr };
-    juce::AudioParameterFloat* gainPtr{ nullptr };
-    juce::AudioParameterFloat* freqPtr{ nullptr };
-    juce::AudioParameterFloat* bandPtr{ nullptr };
-
-    TransformationType typePtr = TransformationType::dfIt;
-
-    
+    juce::AudioParameterBool*     ioPtr{ nullptr };
+    juce::AudioParameterFloat*    frequencyPtr{ nullptr };
+    juce::AudioParameterFloat*    resonancePtr{ nullptr };
+    juce::AudioParameterFloat*    gainPtr{ nullptr };
+    juce::AudioParameterChoice*    transformPtr{ nullptr };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProcessWrapper)
 };
