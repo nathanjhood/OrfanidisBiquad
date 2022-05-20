@@ -70,7 +70,7 @@ void Transformations<SampleType>::coefficients(SampleType b0, SampleType b1, Sam
 }
 
 template <typename SampleType>
-void Transformations<SampleType>::setTransformType(dfType newTransformType)
+void Transformations<SampleType>::setTransformType(TransformationType newTransformType)
 {
     if (transformType != newTransformType)
     {
@@ -89,13 +89,13 @@ SampleType Transformations<SampleType>::processSample(int channel, SampleType in
     jassert(isPositiveAndBelow(channel, Yn_1.size()));
     jassert(isPositiveAndBelow(channel, Yn_1.size()));
 
-    if (transformType == TransformationType::dfI)
+    if (transformType == TransformationType::directFormI)
         inputValue = directFormI(channel, inputValue);
-    else if (transformType == TransformationType::dfII)
+    else if (transformType == TransformationType::directFormII)
         inputValue = directFormII(channel, inputValue);
-    else if (transformType == TransformationType::dfIt)
+    else if (transformType == TransformationType::directFormItransposed)
         inputValue = directFormITransposed(channel, inputValue);
-    else if (transformType == TransformationType::dfIIt)
+    else if (transformType == TransformationType::directFormIItransposed)
         inputValue = directFormIITransposed(channel, inputValue);
 
     return inputValue;
@@ -160,17 +160,6 @@ SampleType Transformations<SampleType>::directFormIITransposed(int channel, Samp
 
     return Yn;
 }
-
-//template <typename SampleType>
-//SampleType Transformations<SampleType>::directFormIITransposed(int channel, SampleType inputValue)
-//{
-//    SampleType Xn = inputValue;
-//    juce::ignoreUnused(channel);
-//
-//    SampleType Yn = ((Xn * b0_) + (Xn * b1_) + (Xn * b2_) + (Xn * a1_) + (Xn * a2_));
-//
-//    return Yn;
-//}
 
 template <typename SampleType>
 void Transformations<SampleType>::snapToZero() noexcept
