@@ -9,7 +9,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "ProcessorWrapper.h"
+#include "PluginParameters.h"
+#include "PluginWrapper.h"
 
 //==============================================================================
 /**
@@ -17,27 +18,33 @@
 class OrfanidisBiquadAudioProcessor : public juce::AudioProcessor
 {
 public:
+    using APVTS = juce::AudioProcessorValueTreeState;
+    using precisionType = ProcessingPrecision;
     //==============================================================================
     OrfanidisBiquadAudioProcessor();
     ~OrfanidisBiquadAudioProcessor() override;
 
-    //==============================================================================
+    //==========================================================================
     juce::AudioProcessorParameter* getBypassParameter() const;
-    bool supportsDoublePrecisionProcessing() const;
+    bool supportsDoublePrecisionProcessing() const override;
+    ProcessingPrecision getProcessingPrecision() const noexcept;
+    bool isUsingDoublePrecision() const noexcept;
+    void setProcessingPrecision(ProcessingPrecision newPrecision) noexcept;
 
     //==============================================================================
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-#ifndef JucePlugin_PreferredChannelConfigurations
+    void numChannelsChanged() override;
+    void numBusesChanged() override;
+    void processorLayoutsChanged() override;
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
-#endif
 
     //==============================================================================
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     void processBlock(juce::AudioBuffer<double>&, juce::MidiBuffer&) override;
-    void processBlockBypassed(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages);
-    void processBlockBypassed(juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages);
+    void processBlockBypassed(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) override;
+    void processBlockBypassed(juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages) override;
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -62,30 +69,30 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
-    //==============================================================================
-    juce::AudioProcessorValueTreeState& getAPVTS();
-    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+    //==========================================================================
+    /** Audio processor value tree. */
+    juce::UndoManager undoManager;
+    APVTS apvts;
+    APVTS& getAPVTS() { return apvts; };
+    static APVTS::ParameterLayout createParameterLayout();
 
 private:
-
-    //==============================================================================
-    void update();
-
-    //==============================================================================
+    //==========================================================================
     /** Audio processor members. */
-    ProcessWrapper<float> processor{ (apvts) };
+    Parameters parameters { *this, getAPVTS() };
+    ProcessWrapper<float> processorFloat { *this, getAPVTS() };
+    ProcessWrapper<double> processorDouble { *this, getAPVTS() };
 
-    //==============================================================================
+    //==========================================================================
     /** Parameter pointers. */
-    juce::AudioParameterBool* bitsPtr{ nullptr };
-    juce::AudioParameterBool* bypPtr{ nullptr };
+    juce::AudioParameterInt* precisionPtr { nullptr };
+    juce::AudioParameterBool* bypassPtr { nullptr };
 
-    //==============================================================================
+    //==========================================================================
     /** Init variables. */
-    double ramp = 0.0001;
+    precisionType processingPrecision = precisionType::singlePrecision;
 
-
+    //==========================================================================
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OrfanidisBiquadAudioProcessor)
 };
