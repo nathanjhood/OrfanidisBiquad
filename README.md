@@ -57,14 +57,12 @@ Coffee! That's how I get things done!! If you'd like to see me get more things d
  <a href= "https://www.facebook.com/StoneyDSP.Audio/"><img src="https://github.com/StoneyDSP/StoneyDSP/blob/9608562b09ee2708affd0c31117fc25a235672d9/Assets/facebook.png"/></a>
 </p>
 
-# Manual - v1.0.3b
+# Manual - v1.1.0b.1
 
-+ IO - Toggles the filter band on or off.
 + Frequency - Sets the centre frequency of the equalizer filter.
-+ Resonance - Increases the amount of "emphasis" of the corner frequency
++ Bandwidth - Increases the amount of "emphasis" of the corner frequency
 + Gain - Boost/cut the audio at the centre frequency (affects only the Peak and Shelf modes!)
 + Transform** - Chooses the type of bilinear transform to use. See below for more.
-+ Precision - Switch between Float precision (High Quality) and Double precision (beyond High Quality) in the audio path
 + Bypass - Toggles the entire plugin on or off.
 
 Transform*;
