@@ -3,7 +3,7 @@ v.1.1.0b.1 (10/06/2022)
 ![Orf-AutoGUI-1-1-0b](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0bd9a0f062ea1e3f620d4be9936143ecd9300597/Res/Orf-AutoGUI-1-1-0b.png)
 
 NEW (available for testing)!
-+ AutoComponent (basic implementation)
++ Resizable AutoComponent GUI object (basic implementation) using custom Look and Feel
 + Upgraded Transforms DSP
 + Implemented all OrfPeak processing in new dedicated files
 + Removed unneccesary files
@@ -23,6 +23,7 @@ To be done?
 + Implement AudioParameterGroups in AutoComponent, to work towards multi-band equalizer processing layouts
 + Explore use of ProcessorChain for multi-band equalizer potentials
 + Try switching behaviour for RBJ to ORF peak filter calcuations and easy comparisons...?
++ Dark/midnight/grey colour scheme modes?
 
 # OrfanidisBiquad
 Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
