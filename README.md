@@ -1,4 +1,28 @@
-v.1.0.3b.1
+v.1.1.0b.1 (10/06/2022)
+
+![Orf-AutoGUI-1-1-0b](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0bd9a0f062ea1e3f620d4be9936143ecd9300597/Res/Orf-AutoGUI-1-1-0b.png)
+
+NEW (available for testing)!
++ AutoComponent (basic implementation)
++ Upgraded Transforms DSP
++ Implemented all OrfPeak processing in new dedicated files
++ Removed unneccesary files
++ Forward declarations and back references in place
++ Began undo/redo
++ Implemented Smoothers
++ Implemented output gain
++ Removed floats switch (for now)
++ Improved file structure
++ Improved plugin architecture
++ Added license notes (GNU GPL 3.0)
+
+To be done?
++ Attempt "std::abs(1-(GainToDb(bandwidth)))" for bandwidth param (keep param input at 0 to 1)
++ Float switch
++ Boil calculations back down into functions inc. a maths header if/where needed
++ Implement AudioParameterGroups in AutoComponent, to work towards multi-band equalizer processing layouts
++ Explore use of ProcessorChain for multi-band equalizer potentials
++ Try switching behaviour for RBJ to ORF peak filter calcuations and easy comparisons...?
 
 # OrfanidisBiquad
 Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
