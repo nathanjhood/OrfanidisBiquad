@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="EkUu6o" name="OrfanidisBiquad" projectType="audioplug" useAppConfig="1"
-              addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest"
-              version="1.0.3b.2">
+              version="1.1.0b" companyEmail="nathan@stoneydsp.com">
   <MAINGROUP id="TFytBu" name="OrfanidisBiquad">
     <GROUP id="{FBE74690-22DE-D413-8178-F49C51EE16C3}" name="Res">
       <FILE id="asZTR5" name="OrfanidisBiquad.png" compile="0" resource="1"
             file="Res/OrfanidisBiquad.png"/>
     </GROUP>
     <GROUP id="{41624350-3ED7-0AD8-E4A9-E9E6C747C1B4}" name="Source">
-      <FILE id="kbZ7AX" name="Biquads.cpp" compile="1" resource="0" file="Source/Biquads.cpp"/>
-      <FILE id="dU96g8" name="Biquads.h" compile="0" resource="0" file="Source/Biquads.h"/>
-      <FILE id="RU48XX" name="OrfCoefficients.cpp" compile="1" resource="0"
-            file="Source/OrfCoefficients.cpp"/>
-      <FILE id="dEB1z0" name="OrfCoefficients.h" compile="0" resource="0"
-            file="Source/OrfCoefficients.h"/>
-      <FILE id="VNPUkj" name="ProcessorWrapper.cpp" compile="1" resource="0"
-            file="Source/ProcessorWrapper.cpp"/>
-      <FILE id="N59JDc" name="ProcessorWrapper.h" compile="0" resource="0"
-            file="Source/ProcessorWrapper.h"/>
-      <FILE id="mKChb0" name="Convert.cpp" compile="1" resource="0" file="Source/Convert.cpp"/>
-      <FILE id="fLgXoG" name="Convert.h" compile="0" resource="0" file="Source/Convert.h"
-            xcodeResource="0"/>
+      <GROUP id="{CE3792C0-DA0E-D289-357F-C7A4AA2320A6}" name="Components">
+        <FILE id="d0OcZO" name="AutoComponent.cpp" compile="1" resource="0"
+              file="Source/Components/AutoComponent.cpp"/>
+        <FILE id="qlVl27" name="AutoComponent.h" compile="0" resource="0" file="Source/Components/AutoComponent.h"/>
+      </GROUP>
+      <GROUP id="{5C8EBC0B-F3C1-EC8D-D228-3B34B412D03A}" name="Modules">
+        <FILE id="GVcsTy" name="Biquads.cpp" compile="1" resource="0" file="Source/Modules/Biquads.cpp"/>
+        <FILE id="qOA5cs" name="Biquads.h" compile="0" resource="0" file="Source/Modules/Biquads.h"/>
+        <FILE id="pPTQkr" name="OrfanidisPeak.cpp" compile="1" resource="0"
+              file="Source/Modules/OrfanidisPeak.cpp"/>
+        <FILE id="rFnRUa" name="OrfanidisPeak.h" compile="0" resource="0" file="Source/Modules/OrfanidisPeak.h"/>
+      </GROUP>
+      <FILE id="CBkBsc" name="PluginParameters.cpp" compile="1" resource="0"
+            file="Source/PluginParameters.cpp"/>
+      <FILE id="Qo8cd6" name="PluginParameters.h" compile="0" resource="0"
+            file="Source/PluginParameters.h"/>
+      <FILE id="VNPUkj" name="PluginWrapper.cpp" compile="1" resource="0"
+            file="Source/PluginWrapper.cpp"/>
+      <FILE id="N59JDc" name="PluginWrapper.h" compile="0" resource="0" file="Source/PluginWrapper.h"/>
       <FILE id="D6ssIL" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="qua56B" name="PluginProcessor.h" compile="0" resource="0"
@@ -30,9 +36,6 @@
       <FILE id="kOhBy9" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="SMbTvd" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="AdedAE" name="OrfanidisCalc.h" compile="0" resource="0" file="Source/OrfanidisCalc.h"/>
-      <FILE id="xZXsCa" name="Transform.cpp" compile="1" resource="0" file="Source/Transform.cpp"/>
-      <FILE id="cgnc2P" name="Transform.h" compile="0" resource="0" file="Source/Transform.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
