@@ -11,51 +11,49 @@
 
 //==============================================================================
 OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
     : AudioProcessor(BusesProperties()
         .withInput("Input", juce::AudioChannelSet::stereo(), true)
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
-    )
-#endif
-
+    ),
+    apvts(*this, &undoManager, "Parameters", createParameterLayout())
 {
-    bitsPtr = dynamic_cast       <juce::AudioParameterBool*>    (apvts.getParameter("bitsID"));
-    jassert(bitsPtr != nullptr);
-
-    bypPtr = dynamic_cast       <juce::AudioParameterBool*>    (apvts.getParameter("bypassID"));
-    jassert(bypPtr != nullptr);
+    bypassPtr = static_cast <juce::AudioParameterBool*> (apvts.getParameter("bypassID"));
+    jassert(bypassPtr != nullptr);
 }
 
 OrfanidisBiquadAudioProcessor::~OrfanidisBiquadAudioProcessor()
 {
 }
 
-juce::AudioProcessorValueTreeState& OrfanidisBiquadAudioProcessor::getAPVTS()
-{
-    return apvts;
-}
-
-juce::AudioProcessorValueTreeState::ParameterLayout OrfanidisBiquadAudioProcessor::createParameterLayout()
-{
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-
-    ProcessWrapper<float>::createParameterLayout(params);
-
-    params.push_back(std::make_unique<juce::AudioParameterBool>("bitsID", "Doubles", false));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("bypassID", "Bypass", false));
-    
-    return { params.begin(), params.end() };
-}
-
 //==============================================================================
 juce::AudioProcessorParameter* OrfanidisBiquadAudioProcessor::getBypassParameter() const
 {
-    return bypPtr;
+    return bypassPtr;
 }
 
 bool OrfanidisBiquadAudioProcessor::supportsDoublePrecisionProcessing() const
 {
     return false;
+}
+
+juce::AudioProcessor::ProcessingPrecision OrfanidisBiquadAudioProcessor::getProcessingPrecision() const noexcept
+{
+    return processingPrecision;
+}
+
+bool OrfanidisBiquadAudioProcessor::isUsingDoublePrecision() const noexcept
+{
+    return processingPrecision == doublePrecision;
+}
+
+void OrfanidisBiquadAudioProcessor::setProcessingPrecision(ProcessingPrecision newPrecision) noexcept
+{
+    if (processingPrecision != newPrecision)
+    {
+        processingPrecision = newPrecision;
+        releaseResources();
+        reset();
+    }
 }
 
 //==============================================================================
@@ -66,29 +64,17 @@ const juce::String OrfanidisBiquadAudioProcessor::getName() const
 
 bool OrfanidisBiquadAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
     return false;
-   #endif
 }
 
 bool OrfanidisBiquadAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
     return false;
-   #endif
 }
 
 bool OrfanidisBiquadAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
-    return true;
-   #else
     return false;
-   #endif
 }
 
 double OrfanidisBiquadAudioProcessor::getTailLengthSeconds() const
@@ -128,78 +114,70 @@ void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int sample
 {
     getProcessingPrecision();
 
-    processor.prepare(sampleRate, samplesPerBlock, getTotalNumInputChannels());
-    processor.reset();
+    processorFloat.prepare(sampleRate, samplesPerBlock);
+    processorDouble.prepare(sampleRate, samplesPerBlock);
 }
 
 void OrfanidisBiquadAudioProcessor::releaseResources()
 {
-    processor.reset();
+    processorFloat.reset();
+    processorDouble.reset();
 }
 
-void OrfanidisBiquadAudioProcessor::update()
+void OrfanidisBiquadAudioProcessor::numChannelsChanged()
 {
-    bitsPtr->get();
-    bypPtr->get();
-    
+    releaseResources();
 }
 
-#ifndef JucePlugin_PreferredChannelConfigurations
+void OrfanidisBiquadAudioProcessor::numBusesChanged()
+{
+    releaseResources();
+}
+
+void OrfanidisBiquadAudioProcessor::processorLayoutsChanged()
+{
+    releaseResources();
+}
+
 bool OrfanidisBiquadAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
-    return true;
-  #else
-
     if (layouts.getMainInputChannelSet() == juce::AudioChannelSet::disabled()
     || layouts.getMainOutputChannelSet() == juce::AudioChannelSet::disabled())
         return false;
 
-   #if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
 
     return layouts.getMainInputChannelSet() == layouts.getMainOutputChannelSet();
-  #endif
 }
-#endif
 
 void OrfanidisBiquadAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (bypPtr->get() == false)
-
+    if (bypassPtr->get() == true)
     {
-        juce::ScopedNoDenormals noDenormals;
-
-        update();
-
-        processor.process(buffer, midiMessages);
+        processBlockBypassed(buffer, midiMessages);
     }
 
     else
     {
-        processBlockBypassed(buffer, midiMessages);
+        juce::ScopedNoDenormals noDenormals;
+
+        processorFloat.process(buffer, midiMessages);
     }
 }
 
 void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (bypPtr->get() == false)
-
+    if (bypassPtr->get() == true)
     {
-        juce::ignoreUnused(buffer);
-        juce::ignoreUnused(midiMessages);
-
-        juce::ScopedNoDenormals noDenormals;
-
-        update();
+        processBlockBypassed(buffer, midiMessages);
     }
 
     else
     {
-        processBlockBypassed(buffer, midiMessages);
+        juce::ScopedNoDenormals noDenormals;
+
+        processorDouble.process(buffer, midiMessages);
     }
 }
 
@@ -223,8 +201,16 @@ bool OrfanidisBiquadAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* OrfanidisBiquadAudioProcessor::createEditor()
 {
-    //return new OrfanidisBiquadAudioProcessorEditor (*this);
-    return new GenericAudioProcessorEditor (*this);
+    return new OrfanidisBiquadAudioProcessorEditor(*this, getAPVTS(), undoManager);
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout OrfanidisBiquadAudioProcessor::createParameterLayout()
+{
+    APVTS::ParameterLayout params;
+
+    Parameters::setParameterLayout(params);
+
+    return params;
 }
 
 //==============================================================================
