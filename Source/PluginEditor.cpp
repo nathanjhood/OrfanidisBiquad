@@ -16,14 +16,12 @@ OrfanidisBiquadAudioProcessorEditor::OrfanidisBiquadAudioProcessorEditor (Orfani
     audioProcessor(p),
     state(apvts),
     undoManager(um),
-    subComponents(p, apvts),
-    undoButton("Undo"),
-    redoButton("Redo")
+    subComponents(p, apvts)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 
-    setSize(425, 250);
+    setSize(425, 300);
     addAndMakeVisible(subComponents);
     addAndMakeVisible(undoButton);
     addAndMakeVisible(redoButton);
@@ -31,7 +29,7 @@ OrfanidisBiquadAudioProcessorEditor::OrfanidisBiquadAudioProcessorEditor (Orfani
     redoButton.onClick = [this] { undoManager.redo(); };
     setResizable(true, true);
 
-    //startTimerHz(24);
+    startTimerHz(60);
 }
 
 
@@ -39,11 +37,10 @@ OrfanidisBiquadAudioProcessorEditor::~OrfanidisBiquadAudioProcessorEditor()
 {
 }
 
-////==============================================================================
-//void OrfanidisBiquadAudioProcessorEditor::timerCallback()
-//{
-//    undoManager.beginNewTransaction();
-//}
+//==============================================================================
+void OrfanidisBiquadAudioProcessorEditor::timerCallback()
+{
+}
 
 void OrfanidisBiquadAudioProcessorEditor::paint (juce::Graphics& g)
 {
