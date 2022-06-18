@@ -15,10 +15,12 @@ OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
         .withInput("Input", juce::AudioChannelSet::stereo(), true)
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
     ),
-    apvts(*this, &undoManager, "Parameters", createParameterLayout())
+    apvts(*this, &undoManager, "Parameters", createParameterLayout()),
+    spec(),
+    parameters(*this, getAPVTS()),
+    processorFloat(*this, getAPVTS(), getSpec()),
+    processorDouble(*this, getAPVTS(), getSpec())
 {
-    bypassPtr = static_cast <juce::AudioParameterBool*> (apvts.getParameter("bypassID"));
-    jassert(bypassPtr != nullptr);
 }
 
 OrfanidisBiquadAudioProcessor::~OrfanidisBiquadAudioProcessor()
@@ -28,7 +30,22 @@ OrfanidisBiquadAudioProcessor::~OrfanidisBiquadAudioProcessor()
 //==============================================================================
 juce::AudioProcessorParameter* OrfanidisBiquadAudioProcessor::getBypassParameter() const
 {
-    return bypassPtr;
+    return bypassState;
+}
+
+bool OrfanidisBiquadAudioProcessor::isBypassed() const noexcept
+{
+    return bypassState->get() == true;
+}
+
+void OrfanidisBiquadAudioProcessor::setBypassParameter(juce::AudioParameterBool* newBypass) noexcept
+{
+    if (bypassState != newBypass)
+    {
+        bypassState = newBypass;
+        releaseResources();
+        reset();
+    }
 }
 
 bool OrfanidisBiquadAudioProcessor::supportsDoublePrecisionProcessing() const
@@ -48,11 +65,16 @@ bool OrfanidisBiquadAudioProcessor::isUsingDoublePrecision() const noexcept
 
 void OrfanidisBiquadAudioProcessor::setProcessingPrecision(ProcessingPrecision newPrecision) noexcept
 {
+    // If you hit this assertion then you're trying to use double precision
+    // processing on a processor which does not support it!
+    jassert(newPrecision != doublePrecision || supportsDoublePrecisionProcessing());
+
     if (processingPrecision != newPrecision)
     {
         processingPrecision = newPrecision;
         releaseResources();
-        reset();
+        processorFloat.reset();
+        processorDouble.reset();
     }
 }
 
@@ -114,8 +136,8 @@ void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int sample
 {
     getProcessingPrecision();
 
-    processorFloat.prepare(sampleRate, samplesPerBlock);
-    processorDouble.prepare(sampleRate, samplesPerBlock);
+    processorFloat.prepare(getSpec());
+    processorDouble.prepare(getSpec());
 }
 
 void OrfanidisBiquadAudioProcessor::releaseResources()
@@ -127,16 +149,22 @@ void OrfanidisBiquadAudioProcessor::releaseResources()
 void OrfanidisBiquadAudioProcessor::numChannelsChanged()
 {
     releaseResources();
+    processorFloat.prepare(getSpec());
+    processorDouble.prepare(getSpec());
 }
 
 void OrfanidisBiquadAudioProcessor::numBusesChanged()
 {
     releaseResources();
+    processorFloat.prepare(getSpec());
+    processorDouble.prepare(getSpec());
 }
 
 void OrfanidisBiquadAudioProcessor::processorLayoutsChanged()
 {
     releaseResources();
+    processorFloat.prepare(getSpec());
+    processorDouble.prepare(getSpec());
 }
 
 bool OrfanidisBiquadAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -153,7 +181,7 @@ bool OrfanidisBiquadAudioProcessor::isBusesLayoutSupported (const BusesLayout& l
 
 void OrfanidisBiquadAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (bypassPtr->get() == true)
+    if (bypassState->get() == true)
     {
         processBlockBypassed(buffer, midiMessages);
     }
@@ -168,7 +196,7 @@ void OrfanidisBiquadAudioProcessor::processBlock (juce::AudioBuffer<float>& buff
 
 void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (bypassPtr->get() == true)
+    if (bypassState->get() == true)
     {
         processBlockBypassed(buffer, midiMessages);
     }
