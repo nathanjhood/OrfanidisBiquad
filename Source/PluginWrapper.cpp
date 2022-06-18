@@ -12,14 +12,15 @@
 #include "PluginProcessor.h"
 
 template <typename SampleType>
-ProcessWrapper<SampleType>::ProcessWrapper(OrfanidisBiquadAudioProcessor& p, APVTS& apvts) 
+ProcessWrapper<SampleType>::ProcessWrapper(OrfanidisBiquadAudioProcessor& p, APVTS& apvts, juce::dsp::ProcessSpec& spec) 
     :
     audioProcessor(p),
-    state(apvts)
+    state(apvts),
+    setup(spec)
 {
-    spec.sampleRate = audioProcessor.getSampleRate();
-    spec.maximumBlockSize = audioProcessor.getBlockSize();
-    spec.numChannels = audioProcessor.getTotalNumInputChannels();
+    setup.sampleRate = audioProcessor.getSampleRate();
+    setup.maximumBlockSize = audioProcessor.getBlockSize();
+    setup.numChannels = audioProcessor.getTotalNumInputChannels();
 
     frequencyPtr = dynamic_cast <juce::AudioParameterFloat*> (state.getParameter("frequencyID"));
     resonancePtr = dynamic_cast <juce::AudioParameterFloat*> (state.getParameter("bandwidthID"));
@@ -39,7 +40,7 @@ ProcessWrapper<SampleType>::ProcessWrapper(OrfanidisBiquadAudioProcessor& p, APV
 }
 
 template <typename SampleType>
-void ProcessWrapper<SampleType>::prepare(double sampleRate, int samplesPerBlock)
+void ProcessWrapper<SampleType>::prepare(juce::dsp::ProcessSpec& spec)
 {
     spec.sampleRate = audioProcessor.getSampleRate();
     spec.maximumBlockSize = audioProcessor.getBlockSize();
@@ -84,9 +85,11 @@ void ProcessWrapper<SampleType>::process(juce::AudioBuffer<SampleType>& buffer, 
 template <typename SampleType>
 void ProcessWrapper<SampleType>::update()
 {
-    spec.sampleRate = audioProcessor.getSampleRate();
-    spec.maximumBlockSize = audioProcessor.getBlockSize();
-    spec.numChannels = audioProcessor.getTotalNumInputChannels();
+    setup.sampleRate = audioProcessor.getSampleRate();
+    setup.maximumBlockSize = audioProcessor.getBlockSize();
+    setup.numChannels = audioProcessor.getTotalNumInputChannels();
+
+    audioProcessor.setBypassParameter(bypassPtr);
 
     mixer.setWetMixProportion(mixPtr->get() * 0.01f);
 
