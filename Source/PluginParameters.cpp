@@ -49,9 +49,7 @@ void Parameters::setParameterLayout(Params& params)
             std::make_unique<juce::AudioParameterChoice>("transformID", "Transform", tString, 3),
             std::make_unique<juce::AudioParameterFloat>("outputID", "Output", outputRange, 00.00f, decibels, outParam),
             std::make_unique<juce::AudioParameterFloat>("mixID", "Mix", mixRange, 100.00f, percentage, genParam),
-            std::make_unique<juce::AudioParameterBool>("bypassID", "Bypass", false),
-            std::make_unique<juce::AudioParameterBool>("undoID", "Undo", false),
-            std::make_unique<juce::AudioParameterBool>("redoID", "Redo", false)
+            std::make_unique<juce::AudioParameterBool>("bypassID", "Bypass", false)
             //==================================================================
             ));
 
