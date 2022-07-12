@@ -11,6 +11,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "Components/AutoComponent.h"
+#include "Components/AutoMeter.h"
 
 //==============================================================================
 /**
@@ -20,7 +21,7 @@ class OrfanidisBiquadAudioProcessorEditor  : public juce::AudioProcessorEditor, 
 public:
     using APVTS = juce::AudioProcessorValueTreeState;
     //==========================================================================
-    OrfanidisBiquadAudioProcessorEditor (OrfanidisBiquadAudioProcessor& p, APVTS& apvts, juce::UndoManager& um);
+    OrfanidisBiquadAudioProcessorEditor (OrfanidisBiquadAudioProcessor& p);
     ~OrfanidisBiquadAudioProcessorEditor() override;
 
     //==============================================================================
@@ -34,6 +35,8 @@ private:
     OrfanidisBiquadAudioProcessor& audioProcessor;
     APVTS& state;
     juce::UndoManager& undoManager;
+
+    AutoMeter meterLeft, meterRight;
 
     AutoComponent subComponents;
     juce::ArrowButton undoButton{ "Undo", 0.5f , juce::Colours::white };
