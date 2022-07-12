@@ -67,7 +67,7 @@ public:
     void prepare(juce::dsp::ProcessSpec& spec);
 
     /** Resets the internal state variables of the processor. */
-    void reset(SampleType initialValue);
+    void reset(SampleType initialValue = {0.0});
 
     /** Ensure that the state variables are rounded to zero if the state
     variables are denormals. This is only needed if you are doing sample
@@ -148,17 +148,13 @@ private:
     /** Coefficient calculation */
     Coefficient<SampleType> b_0, b_1, b_2, a_0, a_1, a_2;
 
+    Coefficient<SampleType> G0, G, GB, w0, Dw;
+
     //==============================================================================
     /** Parameter Smoothers. */
     juce::SmoothedValue<SampleType, juce::ValueSmoothingTypes::Multiplicative> frq;
     juce::SmoothedValue<SampleType, juce::ValueSmoothingTypes::Linear> res;
     juce::SmoothedValue<SampleType, juce::ValueSmoothingTypes::Linear> lev;
-
-    //==============================================================================
-    /** Initialise the parameters. */
-    double sampleRate = 44100.0, rampDurationSeconds = 0.00005;
-    SampleType minFreq = 20.0, maxFreq = 20000.0, hz = 1000.0, q = 0.5, g = 0.0;
-    transformationType transformType = transformationType::directFormIItransposed;
 
     //==========================================================================
     /** Initialised parameter */
@@ -168,11 +164,14 @@ private:
 
     SampleType omega, cos, sin, tan, alpha, a, sqrtA{ 0.0 };
 
+    SampleType gainLin, bandwidthGain, hzFrequency, radSampFrequency, radSampBandwidth {0.0};
+
     //==========================================================================
     /** Initialised constant */
     const SampleType zero = 0.0, one = 1.0, two = 2.0, minusOne = -1.0, minusTwo = -2.0;
     const SampleType pi = juce::MathConstants<SampleType>::pi;
-    double sampleRate = 48000.0;
+    const SampleType root2 = juce::MathConstants<SampleType>::sqrt2;
+    double sampleRate = 44100.0, rampDurationSeconds = 0.00005;
     //==============================================================================
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OrfanidisPeak)

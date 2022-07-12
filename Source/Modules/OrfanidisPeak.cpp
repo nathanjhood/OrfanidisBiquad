@@ -21,7 +21,8 @@ template <typename SampleType>
 OrfanidisPeak<SampleType>::OrfanidisPeak() 
     :
     b0(one), b1(zero), b2(zero), a0(one), a1(zero), a2(zero),
-    b_0(one), b_1(zero), b_2(zero), a_0(one), a_1(zero), a_2(zero)
+    b_0(one), b_1(zero), b_2(zero), a_0(one), a_1(zero), a_2(zero),
+    G0(zero), G(zero), GB(zero), w0(zero), Dw(zero)
 {
     reset(static_cast<SampleType>(0.0));
 }
@@ -36,9 +37,6 @@ void OrfanidisPeak<SampleType>::setFrequency(SampleType newFreq)
     {
         hz = juce::jlimit(minFreq, maxFreq, newFreq);
 
-        omega = (hz * ((pi * two) / static_cast <SampleType>(sampleRate)));
-        cos = (std::cos(omega));
-        sin = (std::sin(omega));
         frq.setTargetValue(hz);
         coefficients();
     }
@@ -47,7 +45,7 @@ void OrfanidisPeak<SampleType>::setFrequency(SampleType newFreq)
 template <typename SampleType>
 void OrfanidisPeak<SampleType>::setResonance(SampleType newRes)
 {
-    jassert(zero <= newRes && newRes <= one);
+    //jassert(zero <= newRes && newRes <= one);
 
     if (q != newRes)
     {
@@ -197,7 +195,7 @@ SampleType OrfanidisPeak<SampleType>::directFormI(int channel, SampleType inputS
 }
 
 template <typename SampleType>
-SampleType OrfanidisPeak<SampleType>::directFormII(int channel, SampleType inputValue)
+SampleType OrfanidisPeak<SampleType>::directFormII(int channel, SampleType inputSample)
 {
     auto& Wn1 = Wn_1[(size_t)channel];
     auto& Wn2 = Wn_2[(size_t)channel];
@@ -216,7 +214,7 @@ SampleType OrfanidisPeak<SampleType>::directFormII(int channel, SampleType input
 }
 
 template <typename SampleType>
-SampleType OrfanidisPeak<SampleType>::directFormITransposed(int channel, SampleType inputValue)
+SampleType OrfanidisPeak<SampleType>::directFormITransposed(int channel, SampleType inputSample)
 {
     auto& Wn1 = Wn_1[(size_t)channel];
     auto& Wn2 = Wn_2[(size_t)channel];
@@ -237,7 +235,7 @@ SampleType OrfanidisPeak<SampleType>::directFormITransposed(int channel, SampleT
 }
 
 template <typename SampleType>
-SampleType OrfanidisPeak<SampleType>::directFormIITransposed(int channel, SampleType inputValue)
+SampleType OrfanidisPeak<SampleType>::directFormIITransposed(int channel, SampleType inputSample)
 {
     auto& Xn1 = Xn_1[(size_t)channel];
     auto& Xn2 = Xn_2[(size_t)channel];
@@ -256,17 +254,17 @@ SampleType OrfanidisPeak<SampleType>::directFormIITransposed(int channel, Sample
 template <typename SampleType>
 void OrfanidisPeak<SampleType>::coefficients()
 {
-    const SampleType gainLin = static_cast <SampleType>(juce::Decibels::decibelsToGain(static_cast<SampleType>(lev.getNextValue())));
-    const SampleType bandwidthGain = static_cast <SampleType> (juce::Decibels::decibelsToGain(lev.getNextValue() / root2));
-    const SampleType hzFrequency = static_cast <SampleType>(frq.getNextValue());
-    const SampleType radSampFrequency = static_cast <SampleType>(hzFrequency * ((two * pi) / sampleRate));
-    const SampleType radSampBandwidth = static_cast <SampleType>(radSampFrequency / (SampleType(1.588308819) * q));
+    gainLin = static_cast <SampleType>(juce::Decibels::decibelsToGain(static_cast<SampleType>(lev.getNextValue())));
+    bandwidthGain = static_cast <SampleType> (juce::Decibels::decibelsToGain(lev.getNextValue() / root2));
+    hzFrequency = static_cast <SampleType>(frq.getNextValue());
+    radSampFrequency = static_cast <SampleType>(hzFrequency * ((two * pi) / sampleRate));
+    radSampBandwidth = static_cast <SampleType>(radSampFrequency / (SampleType(1.588308819) * q));
 
-    SampleType G0 = one;
-    SampleType G = gainLin;
-    SampleType GB = bandwidthGain;
-    SampleType w0 = radSampFrequency;
-    SampleType Dw = radSampBandwidth;
+    G0 = one;
+    G = gainLin;
+    GB = bandwidthGain;
+    w0 = radSampFrequency;
+    Dw = radSampBandwidth;
 
     if (G == GB)    // if no boost or cut, pass audio
     {
