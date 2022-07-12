@@ -23,9 +23,10 @@ class ProcessWrapper
 {
 public:
     using APVTS = juce::AudioProcessorValueTreeState;
+    using Spec = juce::dsp::ProcessSpec;
     //==============================================================================
     /** Constructor. */
-    ProcessWrapper(OrfanidisBiquadAudioProcessor& p, APVTS& apvts, juce::dsp::ProcessSpec& spec);
+    ProcessWrapper(OrfanidisBiquadAudioProcessor& p);
 
     //==========================================================================
     /** Initialises the processor. */
@@ -63,7 +64,6 @@ private:
     juce::AudioParameterChoice* transformPtr { nullptr };
     juce::AudioParameterFloat* outputPtr { nullptr };
     juce::AudioParameterFloat* mixPtr { nullptr };
-    juce::AudioParameterBool* bypassPtr { nullptr };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProcessWrapper)
 };

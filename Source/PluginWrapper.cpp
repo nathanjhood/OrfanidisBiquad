@@ -12,40 +12,30 @@
 #include "PluginProcessor.h"
 
 template <typename SampleType>
-ProcessWrapper<SampleType>::ProcessWrapper(OrfanidisBiquadAudioProcessor& p, APVTS& apvts, juce::dsp::ProcessSpec& spec) 
+ProcessWrapper<SampleType>::ProcessWrapper(OrfanidisBiquadAudioProcessor& p) 
     :
     audioProcessor(p),
-    state(apvts),
-    setup(spec)
+    state(p.getAPVTS()),
+    setup(p.getSpec()),
+    frequencyPtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("frequencyID"))),
+    resonancePtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("resonanceID"))),
+    gainPtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("gainID"))),
+    transformPtr(dynamic_cast <juce::AudioParameterChoice*> (p.getAPVTS().getParameter("transformID"))),
+    outputPtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("outputID"))),
+    mixPtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("mixID")))
 {
-    setup.sampleRate = audioProcessor.getSampleRate();
-    setup.maximumBlockSize = audioProcessor.getBlockSize();
-    setup.numChannels = audioProcessor.getTotalNumInputChannels();
-
-    frequencyPtr = dynamic_cast <juce::AudioParameterFloat*> (state.getParameter("frequencyID"));
-    resonancePtr = dynamic_cast <juce::AudioParameterFloat*> (state.getParameter("bandwidthID"));
-    gainPtr = dynamic_cast <juce::AudioParameterFloat*> (state.getParameter("gainID"));
-    transformPtr = dynamic_cast <juce::AudioParameterChoice*>(state.getParameter("transformID"));
-    outputPtr = dynamic_cast <juce::AudioParameterFloat*> (state.getParameter("outputID"));
-    mixPtr = dynamic_cast <juce::AudioParameterFloat*> (state.getParameter("mixID"));
-    bypassPtr = dynamic_cast <juce::AudioParameterBool*> (state.getParameter("bypassID"));
-
     jassert(frequencyPtr != nullptr);
     jassert(resonancePtr != nullptr);
     jassert(gainPtr != nullptr);
     jassert(transformPtr != nullptr);
     jassert(outputPtr != nullptr);
     jassert(mixPtr != nullptr);
-    jassert(bypassPtr != nullptr);
+
 }
 
 template <typename SampleType>
 void ProcessWrapper<SampleType>::prepare(juce::dsp::ProcessSpec& spec)
 {
-    spec.sampleRate = audioProcessor.getSampleRate();
-    spec.maximumBlockSize = audioProcessor.getBlockSize();
-    spec.numChannels = audioProcessor.getTotalNumInputChannels();
-
     mixer.prepare(spec);
     filter.prepare(spec);
     output.prepare(spec);
@@ -58,7 +48,7 @@ template <typename SampleType>
 void ProcessWrapper<SampleType>::reset() 
 {
     mixer.reset();
-    filter.reset(static_cast<SampleType>(0.0));
+    filter.reset();
     output.reset();
 };
 
@@ -85,20 +75,12 @@ void ProcessWrapper<SampleType>::process(juce::AudioBuffer<SampleType>& buffer, 
 template <typename SampleType>
 void ProcessWrapper<SampleType>::update()
 {
-    setup.sampleRate = audioProcessor.getSampleRate();
-    setup.maximumBlockSize = audioProcessor.getBlockSize();
-    setup.numChannels = audioProcessor.getTotalNumInputChannels();
-
-    audioProcessor.setBypassParameter(bypassPtr);
-
     mixer.setWetMixProportion(mixPtr->get() * 0.01f);
-
     filter.setFrequency(frequencyPtr->get());
     filter.setResonance(resonancePtr->get());
     filter.setGain(gainPtr->get());
     filter.setTransformType(static_cast<TransformationType>(transformPtr->getIndex()));
-
-    output.setGainLinear(juce::Decibels::decibelsToGain(outputPtr->get()));
+    output.setGainDecibels(outputPtr->get());
 };
 
 //==============================================================================
