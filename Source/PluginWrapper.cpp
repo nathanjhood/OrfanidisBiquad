@@ -18,7 +18,7 @@ ProcessWrapper<SampleType>::ProcessWrapper(OrfanidisBiquadAudioProcessor& p)
     state(p.getAPVTS()),
     setup(p.getSpec()),
     frequencyPtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("frequencyID"))),
-    resonancePtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("resonanceID"))),
+    resonancePtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("bandwidthID"))),
     gainPtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("gainID"))),
     transformPtr(dynamic_cast <juce::AudioParameterChoice*> (p.getAPVTS().getParameter("transformID"))),
     outputPtr(dynamic_cast <juce::AudioParameterFloat*> (p.getAPVTS().getParameter("outputID"))),
@@ -64,8 +64,6 @@ void ProcessWrapper<SampleType>::process(juce::AudioBuffer<SampleType>& buffer, 
     mixer.pushDrySamples(block);
 
     juce::dsp::ProcessContextReplacing<SampleType> context(block);
-
-    context.isBypassed = bypassPtr->get();
 
     filter.process(context);
     output.process(context);
