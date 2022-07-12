@@ -19,7 +19,8 @@
 #ifndef ORFANIDISPEAK_H_INCLUDED
 #define ORFANIDISPEAK_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
+#include "Coefficient.h"
 
 enum class TransformationType
 {
@@ -127,26 +128,25 @@ private:
 
     SampleType directFormIITransposed(int channel, SampleType inputValue);
 
-    //==============================================================================
-    SampleType getB0() { return static_cast<SampleType>(b0); }
-    SampleType getB1() { return static_cast<SampleType>(b1); }
-    SampleType getB2() { return static_cast<SampleType>(b2); }
-    SampleType getA0() { return static_cast<SampleType>(a0); }
-    SampleType getA1() { return static_cast<SampleType>(a1); }
-    SampleType getA2() { return static_cast<SampleType>(a2); }
+    //==========================================================================
+    /** Coefficient current value. Safe to pass i.e. to the display thread */
+    SampleType geta0() { return a0.get(); }
+    SampleType getb0() { return b0.get(); }
+    SampleType geta1() { return a1.get(); }
+    SampleType getb1() { return b1.get(); }
+    SampleType geta2() { return a2.get(); }
+    SampleType getb2() { return b2.get(); }
 
     //==============================================================================
     /** Unit-delay objects. */
     std::vector<SampleType> Wn_1, Wn_2, Xn_1, Xn_2, Yn_1, Yn_2;
 
-    //==============================================================================
-    /** Initialise the coefficient gains. */
-    SampleType b0 = 1.0;
-    SampleType b1 = 0.0;
-    SampleType b2 = 0.0;
-    SampleType a0 = 1.0;
-    SampleType a1 = 0.0;
-    SampleType a2 = 0.0;
+    //==========================================================================
+    /** Coefficient gain */
+    Coefficient<SampleType> b0, b1, b2, a0, a1, a2;
+
+    /** Coefficient calculation */
+    Coefficient<SampleType> b_0, b_1, b_2, a_0, a_1, a_2;
 
     //==============================================================================
     /** Parameter Smoothers. */
@@ -160,12 +160,19 @@ private:
     SampleType minFreq = 20.0, maxFreq = 20000.0, hz = 1000.0, q = 0.5, g = 0.0;
     transformationType transformType = transformationType::directFormIItransposed;
 
-    //==============================================================================
-    /** Initialise constants. */
-    const SampleType zero = (0.0), one = (1.0), two = (2.0), minusOne = (-1.0), minusTwo = (-2.0);
-    const SampleType pi = (juce::MathConstants<SampleType>::pi);
-    const SampleType root2 = (std::sqrt(SampleType(2.0)));
+    //==========================================================================
+    /** Initialised parameter */
+    SampleType loop = 0.0, outputSample = 0.0;
+    SampleType minFreq = 20.0, maxFreq = 20000.0, hz = 1000.0, q = 0.5, g = 0.0;
+    transformationType transformType = transformationType::directFormIItransposed;
 
+    SampleType omega, cos, sin, tan, alpha, a, sqrtA{ 0.0 };
+
+    //==========================================================================
+    /** Initialised constant */
+    const SampleType zero = 0.0, one = 1.0, two = 2.0, minusOne = -1.0, minusTwo = -2.0;
+    const SampleType pi = juce::MathConstants<SampleType>::pi;
+    double sampleRate = 48000.0;
     //==============================================================================
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OrfanidisPeak)

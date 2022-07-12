@@ -24,7 +24,7 @@ public:
     using Params = juce::AudioProcessorValueTreeState::ParameterLayout;
     //==========================================================================
     /** Constructor. */
-    Parameters(OrfanidisBiquadAudioProcessor& p, APVTS& apvts);
+    Parameters(OrfanidisBiquadAudioProcessor& p);
 
     //==========================================================================
     /** Create Parameter Layout. */

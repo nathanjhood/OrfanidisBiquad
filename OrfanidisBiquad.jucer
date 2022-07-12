@@ -3,7 +3,7 @@
 <JUCERPROJECT id="EkUu6o" name="OrfanidisBiquad" projectType="audioplug" useAppConfig="1"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               companyName="StoneyDSP" pluginFormats="buildVST3" cppLanguageStandard="latest"
-              version="1.1.0b" companyEmail="nathan@stoneydsp.com">
+              version="1.1.01b" companyEmail="nathan@stoneydsp.com">
   <MAINGROUP id="TFytBu" name="OrfanidisBiquad">
     <GROUP id="{FBE74690-22DE-D413-8178-F49C51EE16C3}" name="Res">
       <FILE id="asZTR5" name="OrfanidisBiquad.png" compile="0" resource="1"
@@ -14,10 +14,13 @@
         <FILE id="d0OcZO" name="AutoComponent.cpp" compile="1" resource="0"
               file="Source/Components/AutoComponent.cpp"/>
         <FILE id="qlVl27" name="AutoComponent.h" compile="0" resource="0" file="Source/Components/AutoComponent.h"/>
+        <FILE id="IZptB7" name="AutoMeter.h" compile="0" resource="0" file="Source/Components/AutoMeter.h"/>
       </GROUP>
       <GROUP id="{5C8EBC0B-F3C1-EC8D-D228-3B34B412D03A}" name="Modules">
         <FILE id="GVcsTy" name="Biquads.cpp" compile="1" resource="0" file="Source/Modules/Biquads.cpp"/>
         <FILE id="qOA5cs" name="Biquads.h" compile="0" resource="0" file="Source/Modules/Biquads.h"/>
+        <FILE id="bBDNaH" name="Coefficient.cpp" compile="1" resource="0" file="Source/Modules/Coefficient.cpp"/>
+        <FILE id="XZ2OqS" name="Coefficient.h" compile="0" resource="0" file="Source/Modules/Coefficient.h"/>
         <FILE id="pPTQkr" name="OrfanidisPeak.cpp" compile="1" resource="0"
               file="Source/Modules/OrfanidisPeak.cpp"/>
         <FILE id="rFnRUa" name="OrfanidisPeak.h" compile="0" resource="0" file="Source/Modules/OrfanidisPeak.h"/>

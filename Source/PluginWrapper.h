@@ -23,13 +23,14 @@ class ProcessWrapper
 {
 public:
     using APVTS = juce::AudioProcessorValueTreeState;
+    using Spec = juce::dsp::ProcessSpec;
     //==============================================================================
     /** Constructor. */
-    ProcessWrapper(OrfanidisBiquadAudioProcessor& p, APVTS& apvts);
+    ProcessWrapper(OrfanidisBiquadAudioProcessor& p);
 
     //==========================================================================
     /** Initialises the processor. */
-    void prepare(double sampleRate, int samplesPerBlock);
+    void prepare(juce::dsp::ProcessSpec& spec);
 
     /** Resets the internal state variables of the processor. */
     void reset();
@@ -47,23 +48,22 @@ private:
     // access the processor object that created it.
     OrfanidisBiquadAudioProcessor& audioProcessor;
     APVTS& state;
+    juce::dsp::ProcessSpec& setup;
 
     //==============================================================================
     /** Instantiate objects. */
-    juce::dsp::ProcessSpec spec;
     juce::dsp::DryWetMixer<SampleType> mixer;
     OrfanidisPeak<SampleType> filter;
     juce::dsp::Gain<SampleType> output;
 
     //==========================================================================
     /** Parameter pointers. */
-    juce::AudioParameterFloat* frequencyPtr{ nullptr };
-    juce::AudioParameterFloat* resonancePtr{ nullptr };
-    juce::AudioParameterFloat* gainPtr{ nullptr };
-    juce::AudioParameterChoice* transformPtr{ nullptr };
-    juce::AudioParameterFloat* outputPtr{ nullptr };
-    juce::AudioParameterFloat* mixPtr{ nullptr };
-    juce::AudioParameterBool* bypassPtr{ nullptr };
+    juce::AudioParameterFloat* frequencyPtr { nullptr };
+    juce::AudioParameterFloat* resonancePtr { nullptr };
+    juce::AudioParameterFloat* gainPtr { nullptr };
+    juce::AudioParameterChoice* transformPtr { nullptr };
+    juce::AudioParameterFloat* outputPtr { nullptr };
+    juce::AudioParameterFloat* mixPtr { nullptr };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProcessWrapper)
 };
