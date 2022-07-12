@@ -14,10 +14,13 @@
         <FILE id="d0OcZO" name="AutoComponent.cpp" compile="1" resource="0"
               file="Source/Components/AutoComponent.cpp"/>
         <FILE id="qlVl27" name="AutoComponent.h" compile="0" resource="0" file="Source/Components/AutoComponent.h"/>
+        <FILE id="IZptB7" name="AutoMeter.h" compile="0" resource="0" file="Source/Components/AutoMeter.h"/>
       </GROUP>
       <GROUP id="{5C8EBC0B-F3C1-EC8D-D228-3B34B412D03A}" name="Modules">
         <FILE id="GVcsTy" name="Biquads.cpp" compile="1" resource="0" file="Source/Modules/Biquads.cpp"/>
         <FILE id="qOA5cs" name="Biquads.h" compile="0" resource="0" file="Source/Modules/Biquads.h"/>
+        <FILE id="bBDNaH" name="Coefficient.cpp" compile="1" resource="0" file="Source/Modules/Coefficient.cpp"/>
+        <FILE id="XZ2OqS" name="Coefficient.h" compile="0" resource="0" file="Source/Modules/Coefficient.h"/>
         <FILE id="pPTQkr" name="OrfanidisPeak.cpp" compile="1" resource="0"
               file="Source/Modules/OrfanidisPeak.cpp"/>
         <FILE id="rFnRUa" name="OrfanidisPeak.h" compile="0" resource="0" file="Source/Modules/OrfanidisPeak.h"/>
