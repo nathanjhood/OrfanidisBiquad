@@ -1,4 +1,29 @@
-v.1.0.3b.1
+v.1.1.0b.1 (10/06/2022)
+
+![Orf-AutoGUI-1-1-0b](https://github.com/StoneyDSP/OrfanidisBiquad/blob/0bd9a0f062ea1e3f620d4be9936143ecd9300597/Res/Orf-AutoGUI-1-1-0b.png)
+
+NEW (available for testing)!
++ Resizable AutoComponent GUI object (basic implementation) using custom Look and Feel
++ Upgraded Transforms DSP
++ Implemented all OrfPeak processing in new dedicated files
++ Removed unneccesary files
++ Forward declarations and back references in place
++ Began undo/redo
++ Implemented Smoothers
++ Implemented output gain
++ Removed floats switch (for now)
++ Improved file structure
++ Improved plugin architecture
++ Added license notes (GNU GPL 3.0)
+
+To be done?
++ Attempt "std::abs(1-(GainToDb(bandwidth)))" for bandwidth param (keep param input at 0 to 1)
++ Float switch
++ Boil calculations back down into functions inc. a maths header if/where needed
++ Implement AudioParameterGroups in AutoComponent, to work towards multi-band equalizer processing layouts
++ Explore use of ProcessorChain for multi-band equalizer potentials
++ Try switching behaviour for RBJ to ORF peak filter calcuations and easy comparisons...?
++ Dark/midnight/grey colour scheme modes?
 
 # OrfanidisBiquad
 Audio EQ Peak Band with no digital "cramping", and selectable transformations (Direct Form I & II, plus Direct Form I & II transposed).
@@ -7,23 +32,49 @@ Audio EQ Peak Band with no digital "cramping", and selectable transformations (D
 + Implementing a two-pole peak filter (hopefully more filter types to come), using variable BiLinear transforms and switchable processing precision, to achieve high-quality results!
 + This filter is *not* subject to amplitude and phase warping of the frequency spectrum, even without the use of oversampling.
 + There is currently no parameter smoothing, so BE AWARE that modulating parameters in real-time WILL create loud clicks and pops while passing audio under many settings.
-+ Please see my "Biquads" repository for further information meanwhile.
++ Please see my ["Biquads"](https://github.com/StoneyDSP/Biquads) repository for further information meanwhile.
 
 (Shown below; a +30dB bell-shaped boost at 10kHz, performed on a harmonic-rich 20Hz band-limited Impulse Response in Reaper)
 
 ![Orfanidis Biquad](https://github.com/StoneyDSP/OrfanidisBiquad/blob/90a244fc53f30392cebb302c860a15ec8b51bf0a/Res/OrfOnBlit.png)
 
-To be done:
-+ Implement safe "Floats/Doubles" switching parameter (if possible?)
-+ Implement switchable "RBJ" and "ORF" coefficient calculations
-+ Add second filter band, following same coeff & transform types as the first filter band, but independent freq, gain, Q and IO params
-+ Param smoother "notch-like" artefacts - images to follow
-+ Finish write up and begin on "de-cramped 1st-order filters via four transforms" (under construction)...
-
 (write-up and comparisons to follow - currently under revision)
 
 Reference: Original paper (including MATLAB code) "Digital Parametric Equalizer Design With Prescribed
 Nyquist-Frequency Gain", Sophocles J. Orfanidis, 1996; https://www.ece.rutgers.edu/~orfanidi/ece348/peq.pdf
+
+# Before we begin...
+
+Coffee! That's how I get things done!! If you'd like to see me get more things done, please kindly consider <a href="https://www.patreon.com/bePatron?u=8549187" data-patreon-widget-type="become-patron-button">buying me a coffee</a> or two ;)
+
+<p align="center">
+ <a href= "https://paypal.me/StoneyDSPAudio?country.x=ES&locale.x=en_US"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a>
+</p>
+
+<p align="center">
+ <a href= "https://twitter.com/Stoney_DSP/"><img src="https://github.com/StoneyDSP/StoneyDSP/blob/a075caeedffe23b2733ee38b12f9800f62aab9c2/Assets/twitter.png"/></a>
+ <a href= "https://www.instagram.com/stoney.d.s.p/"><img src="https://github.com/StoneyDSP/StoneyDSP/blob/2253d684ba99e6c072353a94b49315162c381406/Assets/instagram.png"/></a>
+ <a href= "https://www.facebook.com/StoneyDSP.Audio/"><img src="https://github.com/StoneyDSP/StoneyDSP/blob/9608562b09ee2708affd0c31117fc25a235672d9/Assets/facebook.png"/></a>
+</p>
+
+# Manual - v1.1.0b.1
+
++ Frequency - Sets the centre frequency of the equalizer filter.
++ Bandwidth - Increases the amount of "emphasis" of the corner frequency
++ Gain - Boost/cut the audio at the centre frequency (affects only the Peak and Shelf modes!)
++ Transform** - Chooses the type of bilinear transform to use. See below for more.
++ Bypass - Toggles the entire plugin on or off.
+
+Transform*;
+
+Four different ways of applying the filter to the audio.
+
++ Direct Form I
++ Direct Form II
++ Direct Form I transposed
++ Direct Form II transposed
+
+For further information, please continue reading. 
 
 
 # Transformations
@@ -399,6 +450,22 @@ Likewise, the quantization noise created by the feedback network's computational
 However, out of sight and out of mind does not mean out the window; we are able to produce several very pronounced audible artefacts in three of the four structures when processing in Floats (commonly deemed to be a beyond acceptable processing precision for audio purposes, to be debated elsewhere). Indeed only the Transposed Direct Form II manages favourably in all cases, and thus appears to be the prime candidate transformation for Biquad-based Equalizers in all audio application contexts at the time of writing. It stands to reason that these differences in quality shall also hold true (to some degree) for processing in Doubles, although we'd be extremely unlikely to encounter these differences when processing at that level of precision, seemingly well beyond the scope of measurement of our analysis tools - especially, and most critically, our ears. 
 
 - Nathan Hood (StoneyDSP), May 2022.
+
+# Before you go...
+
+Coffee! That's how I get things done!! If you'd like to see me get more things done, please kindly consider <a href="https://www.patreon.com/bePatron?u=8549187" data-patreon-widget-type="become-patron-button">buying me a coffee</a> or two ;)
+
+<p align="center">
+ <a href= "https://paypal.me/StoneyDSPAudio?country.x=ES&locale.x=en_US"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a>
+</p>
+
+<p align="center">
+ <a href= "https://twitter.com/Stoney_DSP/"><img src="https://github.com/StoneyDSP/StoneyDSP/blob/a075caeedffe23b2733ee38b12f9800f62aab9c2/Assets/twitter.png"/></a>
+ <a href= "https://www.instagram.com/stoney.d.s.p/"><img src="https://github.com/StoneyDSP/StoneyDSP/blob/2253d684ba99e6c072353a94b49315162c381406/Assets/instagram.png"/></a>
+ <a href= "https://www.facebook.com/StoneyDSP.Audio/"><img src="https://github.com/StoneyDSP/StoneyDSP/blob/9608562b09ee2708affd0c31117fc25a235672d9/Assets/facebook.png"/></a>
+</p>
+
+# Credits
 
 ^ Credit: Native Instruments for the Direct Form I code (taken from Reaktor 5's Core "Static Filter" library - go figure!) as well as the Core library unit delay, audio thread, and math modulation macros used here (I programmed the three other forms myself; both in Core and in C++).
 
