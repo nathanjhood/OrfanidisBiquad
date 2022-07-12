@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
+
 #include "PluginParameters.h"
 #include "PluginWrapper.h"
 
@@ -19,6 +20,7 @@ class OrfanidisBiquadAudioProcessor : public juce::AudioProcessor
 {
 public:
     using APVTS = juce::AudioProcessorValueTreeState;
+    using Spec = juce::dsp::ProcessSpec;
     using precisionType = ProcessingPrecision;
     //==============================================================================
     OrfanidisBiquadAudioProcessor();
@@ -39,9 +41,6 @@ public:
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-    void numChannelsChanged() override;
-    void numBusesChanged() override;
-    void processorLayoutsChanged() override;
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
 
     //==============================================================================
@@ -74,18 +73,26 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     //==========================================================================
-    /** Audio processor value tree. */
+    /** Undo Manager. */
     juce::UndoManager undoManager;
+    juce::UndoManager& getUndoManager() { return undoManager; };
+
+    //==========================================================================
+    /** Audio processor value tree. */
     APVTS apvts;
     APVTS& getAPVTS() { return apvts; };
     static APVTS::ParameterLayout createParameterLayout();
 
     //==========================================================================
-        /** Audio processor specs. */
-    juce::dsp::ProcessSpec spec;
-    juce::dsp::ProcessSpec& getSpec() { return spec; };
+    /** Audio processor specs. */
+    Spec spec;
+    Spec& getSpec() { return spec; };
+
+    float getRMSLevel(const int channel) const;
 
 private:
+    juce::LinearSmoothedValue<float> rmsLeft, rmsRight;
+
     //==========================================================================
     /** Audio processor members. */
     Parameters parameters;
@@ -94,14 +101,13 @@ private:
 
     //==========================================================================
     /** Parameter pointers. */
-    juce::AudioParameterInt* precisionPtr { nullptr };
-    juce::AudioParameterBool* bypassState { nullptr };
+    juce::AudioParameterInt* precisionPtr{ nullptr };
+    juce::AudioParameterBool* bypassState{ nullptr };
 
     //==========================================================================
     /** Init variables. */
-    double currentSampleRate = 0;
-    int blockSize = 0, latencySamples = 0;
-    ProcessingPrecision processingPrecision = singlePrecision;
+    double rampDurationSeconds = 0.05;
+    ProcessingPrecision processingPrecision;
 
     //==========================================================================
 

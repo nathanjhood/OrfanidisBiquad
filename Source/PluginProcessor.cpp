@@ -17,10 +17,14 @@ OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
     ),
     apvts(*this, &undoManager, "Parameters", createParameterLayout()),
     spec(),
-    parameters(*this, getAPVTS()),
-    processorFloat(*this, getAPVTS(), getSpec()),
-    processorDouble(*this, getAPVTS(), getSpec())
+    rmsLeft(), rmsRight(),
+    parameters(*this),
+    processorFloat(*this),
+    processorDouble(*this),
+    bypassState(dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter("bypassID"))),
+    processingPrecision(singlePrecision)
 {
+    jassert(bypassState != nullptr);
 }
 
 OrfanidisBiquadAudioProcessor::~OrfanidisBiquadAudioProcessor()
@@ -134,7 +138,19 @@ void OrfanidisBiquadAudioProcessor::changeProgramName (int index, const juce::St
 //==============================================================================
 void OrfanidisBiquadAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    getProcessingPrecision();
+    juce::ignoreUnused(sampleRate, samplesPerBlock);
+
+    processingPrecision = getProcessingPrecision();
+
+    spec.sampleRate = getSampleRate();
+    spec.maximumBlockSize = getBlockSize();
+    spec.numChannels = getTotalNumInputChannels();
+
+    rmsLeft.reset(sampleRate, rampDurationSeconds);
+    rmsRight.reset(sampleRate, rampDurationSeconds);
+
+    rmsLeft.setCurrentAndTargetValue(-100.0f);
+    rmsRight.setCurrentAndTargetValue(-100.0f);
 
     processorFloat.prepare(getSpec());
     processorDouble.prepare(getSpec());
@@ -144,27 +160,6 @@ void OrfanidisBiquadAudioProcessor::releaseResources()
 {
     processorFloat.reset();
     processorDouble.reset();
-}
-
-void OrfanidisBiquadAudioProcessor::numChannelsChanged()
-{
-    releaseResources();
-    processorFloat.prepare(getSpec());
-    processorDouble.prepare(getSpec());
-}
-
-void OrfanidisBiquadAudioProcessor::numBusesChanged()
-{
-    releaseResources();
-    processorFloat.prepare(getSpec());
-    processorDouble.prepare(getSpec());
-}
-
-void OrfanidisBiquadAudioProcessor::processorLayoutsChanged()
-{
-    releaseResources();
-    processorFloat.prepare(getSpec());
-    processorDouble.prepare(getSpec());
 }
 
 bool OrfanidisBiquadAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -181,7 +176,7 @@ bool OrfanidisBiquadAudioProcessor::isBusesLayoutSupported (const BusesLayout& l
 
 void OrfanidisBiquadAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (bypassState->get() == true)
+    if (bypassState->get())
     {
         processBlockBypassed(buffer, midiMessages);
     }
@@ -191,12 +186,31 @@ void OrfanidisBiquadAudioProcessor::processBlock (juce::AudioBuffer<float>& buff
         juce::ScopedNoDenormals noDenormals;
 
         processorFloat.process(buffer, midiMessages);
+
+        rmsLeft.skip(buffer.getNumSamples());
+        rmsRight.skip(buffer.getNumSamples());
+
+        {
+            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+            if (value < rmsLeft.getCurrentValue())
+                rmsLeft.setTargetValue(value);
+            else
+                rmsLeft.setCurrentAndTargetValue(value);
+        }
+
+        {
+            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+            if (value < rmsRight.getCurrentValue())
+                rmsRight.setTargetValue(value);
+            else
+                rmsRight.setCurrentAndTargetValue(value);
+        }
     }
 }
 
 void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (bypassState->get() == true)
+    if (bypassState->get())
     {
         processBlockBypassed(buffer, midiMessages);
     }
@@ -206,19 +220,52 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
         juce::ScopedNoDenormals noDenormals;
 
         processorDouble.process(buffer, midiMessages);
+
+        rmsLeft.skip(buffer.getNumSamples());
+        rmsRight.skip(buffer.getNumSamples());
+
+        {
+            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+            if (value < rmsLeft.getCurrentValue())
+                rmsLeft.setTargetValue(value);
+            else
+                rmsLeft.setCurrentAndTargetValue(value);
+        }
+
+        {
+            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+            if (value < rmsRight.getCurrentValue())
+                rmsRight.setTargetValue(value);
+            else
+                rmsRight.setCurrentAndTargetValue(value);
+        }
     }
 }
 
 void OrfanidisBiquadAudioProcessor::processBlockBypassed(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused(buffer);
-    juce::ignoreUnused(midiMessages);
+    midiMessages.clear();
+
+    juce::dsp::AudioBlock<float> block(buffer);
+    juce::dsp::ProcessContextReplacing context(block);
+
+    const auto& inputBlock = context.getInputBlock();
+    auto& outputBlock = context.getOutputBlock();
+
+    outputBlock.copyFrom(inputBlock);
 }
 
 void OrfanidisBiquadAudioProcessor::processBlockBypassed(juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused(buffer);
-    juce::ignoreUnused(midiMessages);
+    midiMessages.clear();
+
+    juce::dsp::AudioBlock<double> block(buffer);
+    juce::dsp::ProcessContextReplacing context(block);
+
+    const auto& inputBlock = context.getInputBlock();
+    auto& outputBlock = context.getOutputBlock();
+
+    outputBlock.copyFrom(inputBlock);
 }
 
 //==============================================================================
@@ -229,12 +276,14 @@ bool OrfanidisBiquadAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* OrfanidisBiquadAudioProcessor::createEditor()
 {
-    return new OrfanidisBiquadAudioProcessorEditor(*this, getAPVTS(), undoManager);
+    return new OrfanidisBiquadAudioProcessorEditor(*this);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout OrfanidisBiquadAudioProcessor::createParameterLayout()
 {
     APVTS::ParameterLayout params;
+
+    params.add(std::make_unique<juce::AudioParameterBool>("bypassID", "Bypass", false));
 
     Parameters::setParameterLayout(params);
 
@@ -256,6 +305,17 @@ void OrfanidisBiquadAudioProcessor::setStateInformation (const void* data, int s
     if (xmlState.get() != nullptr)
         if (xmlState->hasTagName(apvts.state.getType()))
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+}
+
+float OrfanidisBiquadAudioProcessor::getRMSLevel(const int channel) const
+{
+    jassert(channel == 0 || channel == 1);
+
+    if (channel == 0)
+        return rmsLeft.getCurrentValue();
+    if (channel == 1)
+        return rmsRight.getCurrentValue();
+    return 0.0f;
 }
 
 //==============================================================================
