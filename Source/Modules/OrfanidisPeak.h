@@ -121,11 +121,8 @@ private:
     void coefficients();
 
     SampleType directFormI(int channel, SampleType inputValue);
-
     SampleType directFormII(int channel, SampleType inputValue);
-
     SampleType directFormITransposed(int channel, SampleType inputValue);
-
     SampleType directFormIITransposed(int channel, SampleType inputValue);
 
     //==========================================================================
@@ -161,8 +158,6 @@ private:
     SampleType loop = 0.0, outputSample = 0.0;
     SampleType minFreq = 20.0, maxFreq = 20000.0, hz = 1000.0, q = 0.5, g = 0.0;
     transformationType transformType = transformationType::directFormIItransposed;
-
-    SampleType omega, cos, sin, tan, alpha, a, sqrtA{ 0.0 };
 
     SampleType gainLin, bandwidthGain, hzFrequency, radSampFrequency, radSampBandwidth {0.0};
 

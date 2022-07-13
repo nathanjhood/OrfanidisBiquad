@@ -24,7 +24,7 @@ OrfanidisPeak<SampleType>::OrfanidisPeak()
     b_0(one), b_1(zero), b_2(zero), a_0(one), a_1(zero), a_2(zero),
     G0(zero), G(zero), GB(zero), w0(zero), Dw(zero)
 {
-    reset(static_cast<SampleType>(0.0));
+    reset();
 }
 
 //==============================================================================
@@ -33,11 +33,13 @@ void OrfanidisPeak<SampleType>::setFrequency(SampleType newFreq)
 {
     jassert(minFreq <= newFreq && newFreq <= maxFreq);
 
-    if (hz != newFreq)
+    if (frq.getTargetValue() != newFreq)
     {
-        hz = juce::jlimit(minFreq, maxFreq, newFreq);
+        frq.setTargetValue(juce::jlimit(minFreq, maxFreq, newFreq));
 
-        frq.setTargetValue(hz);
+        hzFrequency = frq.getNextValue();
+        radSampFrequency = static_cast <SampleType>(hzFrequency * ((two * pi) / sampleRate));
+        
         coefficients();
     }
 }
@@ -47,10 +49,12 @@ void OrfanidisPeak<SampleType>::setResonance(SampleType newRes)
 {
     //jassert(zero <= newRes && newRes <= one);
 
-    if (q != newRes)
+    if (res.getTargetValue() != newRes)
     {
-        q = juce::jlimit(SampleType(0.0), SampleType(1.0), newRes);
-        res.setTargetValue(q);
+        res.setTargetValue(juce::jlimit(SampleType(0.0), SampleType(1.0), newRes));
+
+        radSampBandwidth = radSampFrequency / (SampleType(1.588308819) * q);
+
         coefficients();
     }
 }
@@ -58,9 +62,15 @@ void OrfanidisPeak<SampleType>::setResonance(SampleType newRes)
 template <typename SampleType>
 void OrfanidisPeak<SampleType>::setGain(SampleType newGain)
 {
-    g = static_cast<SampleType>(newGain);
-    lev.setTargetValue(g);
-    coefficients();
+    if (lev.getTargetValue() != newGain)
+    {
+        lev.setTargetValue(newGain);
+
+        gainLin = juce::Decibels::decibelsToGain(static_cast<SampleType>(lev.getNextValue()));
+        bandwidthGain = juce::Decibels::decibelsToGain(lev.getNextValue() / root2);
+
+        coefficients();
+    }
 }
 
 template <typename SampleType>
@@ -69,7 +79,7 @@ void OrfanidisPeak<SampleType>::setTransformType(transformationType newTransform
     if (transformType != newTransformType)
     {
         transformType = newTransformType;
-        reset(static_cast<SampleType>(0.0));
+        reset();
         coefficients();
     }
 }
@@ -81,7 +91,7 @@ void OrfanidisPeak<SampleType>::setRampDurationSeconds(double newDurationSeconds
     if (rampDurationSeconds != newDurationSeconds)
     {
         rampDurationSeconds = newDurationSeconds;
-        reset(static_cast<SampleType>(0.0));
+        reset();
     }
 }
 
@@ -139,8 +149,6 @@ void OrfanidisPeak<SampleType>::reset(SampleType initialValue)
     frq.reset(sampleRate, rampDurationSeconds);
     res.reset(sampleRate, rampDurationSeconds);
     lev.reset(sampleRate, rampDurationSeconds);
-
-    coefficients();
 }
 
 template <typename SampleType>
@@ -254,12 +262,6 @@ SampleType OrfanidisPeak<SampleType>::directFormIITransposed(int channel, Sample
 template <typename SampleType>
 void OrfanidisPeak<SampleType>::coefficients()
 {
-    gainLin = static_cast <SampleType>(juce::Decibels::decibelsToGain(static_cast<SampleType>(lev.getNextValue())));
-    bandwidthGain = static_cast <SampleType> (juce::Decibels::decibelsToGain(lev.getNextValue() / root2));
-    hzFrequency = static_cast <SampleType>(frq.getNextValue());
-    radSampFrequency = static_cast <SampleType>(hzFrequency * ((two * pi) / sampleRate));
-    radSampBandwidth = static_cast <SampleType>(radSampFrequency / (SampleType(1.588308819) * q));
-
     G0 = one;
     G = gainLin;
     GB = bandwidthGain;
@@ -308,8 +310,6 @@ void OrfanidisPeak<SampleType>::coefficients()
         a_1 = minusTwo * ((one - W2) / (one + W2 + A)),
         a_2 = (one + W2 - A) / (one + W2 + A);
     }
-
-    
 
     a0 = (one / a_0);
     a1 = ((-a_1) * a0);
