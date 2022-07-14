@@ -21,7 +21,7 @@ template <typename SampleType>
 class Coefficient
 {
 public:
-    Coefficient(SampleType init);
+    Coefficient(SampleType init = {(SampleType)0.0});
     ~Coefficient();
 
     /** Returns the coefficient's current value. */
