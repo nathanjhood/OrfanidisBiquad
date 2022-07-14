@@ -21,16 +21,12 @@ template <typename SampleType>
 OrfanidisPeak<SampleType>::OrfanidisPeak() 
     :
     G0(one), G(zero), GB(zero), w0(zero), Dw(zero),
-    frq(minFreq), res(one), gain(zero),
+    frq(minFreq), res(0.5), gain(zero),
     loop(zero), outputSample(zero), omega(zero), 
     minFreq((SampleType)20.0), maxFreq((SampleType)20000.0),
     transformType(TransformationType::directFormIItransposed),
-    F(zero), D(zero), C(zero), B(zero), A(zero), G1(zero), W2(zero), DW(zero),
-    F00(zero), F01(zero), F11(zero), G00(zero), G01(zero), G11(zero), 
-    G0G1(zero),
-    G0W2(zero),
-    omegaPiTwo(zero), onePlusW2A(zero), num(zero), den(zero),
-    Gsq(zero), GsqX(zero), GsqD(zero), Fsq(zero), FsqX(zero), FsqD(zero)
+    D(zero), C(zero), B(zero), A(zero), G1(zero),
+    G0W2(zero), onePlusW2A(zero), num(zero), den(zero)
 {
     reset();
 }
@@ -44,7 +40,6 @@ void OrfanidisPeak<SampleType>::setFrequency(SampleType newFreq)
     if (frq != juce::jlimit(minFreq, maxFreq, newFreq))
     {
         frq = newFreq;
-        
         coefficients();
     }
 }
@@ -55,7 +50,6 @@ void OrfanidisPeak<SampleType>::setResonance(SampleType newRes)
     if (res != juce::jlimit(SampleType(0.1), SampleType(1.0), newRes))
     {
         res = one / newRes;
-
         coefficients();
     }
 }
@@ -66,7 +60,6 @@ void OrfanidisPeak<SampleType>::setGain(SampleType newGain)
     if (gain != newGain)
     {
         gain = newGain;
-
         coefficients();
     }
 }
@@ -254,11 +247,11 @@ void OrfanidisPeak<SampleType>::coefficients()
         calcs();
 
         a_[0] = one;
-        a_[1] = minusTwo * ((one - G0W2) / onePlusW2A);
-        a_[2] = (one + G0W2 - A) / onePlusW2A;
-        b_[0] = (G1 + G0W2 + B) / onePlusW2A;
-        b_[1] = minusTwo * ((G1 - G0W2) / onePlusW2A);
-        b_[2] = (G1 + G0W2 - B) / onePlusW2A;
+        a_[1] = ((one - G0W2) / onePlusW2A) * minusTwo;
+        a_[2] = ((one + G0W2) - A) / onePlusW2A;
+        b_[0] = ((G1 + G0W2) + B) / onePlusW2A;
+        b_[1] = ((G1 - G0W2) / onePlusW2A) * minusTwo;
+        b_[2] = ((G1 + G0W2) - B) / onePlusW2A;
     }
 
     a[0] = (one / a_[0]);
@@ -267,61 +260,72 @@ void OrfanidisPeak<SampleType>::coefficients()
     b[0] = (b_[0] * a[0]);
     b[1] = (b_[1] * a[0]);
     b[2] = (b_[2] * a[0]);
+
+    
 }
 
 template <typename SampleType>
 void OrfanidisPeak<SampleType>::calcs()
 {
-    auto powTwo = [&] (SampleType x) { return (x * x); };
+    // Functions...
+    const auto mul = [&] (SampleType x, SampleType y) { return x * y; };
+    const auto div = [&] (SampleType x, SampleType y) { return y != (SampleType)0.0 ? x / y : (SampleType)0.0; };
+    const auto powTwo = [&] (SampleType x) { return mul(x, x); };
+    const auto absXminY = [&] (SampleType x, SampleType y) { return (std::abs(x - y)); };
+    const auto sqrtXdivY = [&] (SampleType x, SampleType y) { return (std::sqrt(div(x, y))); };
+    const auto sqrtXmulY = [&] (SampleType x, SampleType y) { return (std::sqrt(mul(x, y))); };
+    const auto powOverTwo = [&] (SampleType x, SampleType y) { return std::pow(x, y); };
+    const auto tanXdivY = [&] (SampleType x, SampleType y) { return std::tan(div(x, y)); };
 
+    // Calcs...
     const auto& Gpow2 = powTwo(G);
     const auto& GBpow2 = powTwo(GB);
     const auto& G0pow2 = powTwo(G0);
     const auto& piPow2 = powTwo(pi);
     const auto& w0pow2 = powTwo(w0);
     const auto& DwPow2 = powTwo(Dw);
-
-    F = std::abs(Gpow2 - GBpow2);
-    G00 = std::abs(Gpow2 - G0pow2);
-    F00 = std::abs(GBpow2 - G0pow2);
-
-    omegaPiTwo = std::pow((w0pow2 - piPow2), two);
-
+    
+    const auto& F = absXminY(Gpow2, GBpow2);
+    const auto& G00 = absXminY(Gpow2, G0pow2);
+    const auto& F00 = absXminY(GBpow2, G0pow2);
+    
+    const auto& omegaPiTwo = powOverTwo((w0pow2 - piPow2), two);
+    
     num = G0pow2 * omegaPiTwo + Gpow2 * F00 * piPow2 * DwPow2 / F;
     den = omegaPiTwo + F00 * piPow2 * DwPow2 / F;
-
-    G1 = std::sqrt(num / den);
-
+    
+    G1 = sqrtXdivY(num, den);
+    
     const auto& G1pow2 = powTwo(G1);
-
-    G0G1 = G0 * G1;
-
-    G01 = std::abs(Gpow2 - G0G1);
-    G11 = std::abs(Gpow2 - G1pow2);
-    F01 = std::abs(GBpow2 - G0G1);
-    F11 = std::abs(GBpow2 - G1pow2);
-
-    GsqD = std::sqrt(G11 / G00);
-    GsqX = std::sqrt(G00 * G11);
-    Gsq = G01 - GsqX;
-
-    FsqD = std::sqrt(F00 / F11);
-    FsqX = std::sqrt(F00 * F11);
-    Fsq = F01 - FsqX;
-
-    W2 = GsqD * std::pow(std::tan(w0 / two), two);
-    DW = (one + FsqD * W2) * std::tan(Dw / two);
-
-    const auto& DWpow2 = powTwo(DW);
-
-    G0W2 = G0 * W2;
-
+    
+    const auto& G0G1 = mul(G0, G1);
+    
+    const auto& G01 = absXminY(Gpow2, G0G1);
+    const auto& G11 = absXminY(Gpow2, G1pow2);
+    const auto& F01 = absXminY(GBpow2, G0G1);
+    const auto& F11 = absXminY(GBpow2, G1pow2);
+    
+    const auto& GsqD = sqrtXdivY (G11, G00);
+    const auto& GsqX = sqrtXmulY (G00, G11);
+    const auto& Gsq = G01 - GsqX;
+    
+    const auto& FsqD = sqrtXdivY (F00, F11);
+    const auto& FsqX = sqrtXmulY (F00, F11);
+    const auto& Fsq = F01 - FsqX;
+    
+    const auto& W2 = mul (GsqD, powOverTwo (tanXdivY (w0, two), two));
+    const auto& DW = mul ((one + FsqD * W2), tanXdivY (Dw, two));
+    
+    const auto& DWpow2 = powTwo (DW);
+    
+    G0W2 = mul(G0, W2);
+    
     C = F11 * DWpow2 - two * W2 * Fsq;
     D = two * W2 * Gsq;
-
-    A = std::sqrt((C + D) / F);
-    B = std::sqrt(((Gpow2 * C) + (GBpow2 * D)) / F);
-
+    
+    A = sqrtXdivY((C + D), F);
+    B = sqrtXdivY(((Gpow2 * C) + (GBpow2 * D)), F);
+    
     onePlusW2A = one + W2 + A;
 }
 
@@ -365,6 +369,9 @@ void OrfanidisPeak<SampleType>::snapToZero() noexcept
 //    a_0 = one;
 //    a_1 = minusTwo * ((one - W2) / (one + W2 + A));
 //    a_2 = (one + W2 - A) / (one + W2 + A);
+// 
+// 
+// 
 //}
 
 //==============================================================================
