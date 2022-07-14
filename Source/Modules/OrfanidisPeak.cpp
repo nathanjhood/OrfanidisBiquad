@@ -98,6 +98,8 @@ void OrfanidisPeak<SampleType>::prepare(juce::dsp::ProcessSpec& spec)
     Yn_1.resize(spec.numChannels);
     Yn_2.resize(spec.numChannels);
 
+    omega = (two * pi) / static_cast <SampleType> (sampleRate);
+
     minFreq = static_cast <SampleType> (sampleRate / 24576.0);
     maxFreq = static_cast <SampleType> (sampleRate / 2.125);
 
