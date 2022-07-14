@@ -84,31 +84,6 @@ void OrfanidisPeak<SampleType>::setTransformType(transformationType newTransform
 
 //==============================================================================
 template <typename SampleType>
-void OrfanidisPeak<SampleType>::setRampDurationSeconds(double newDurationSeconds) noexcept
-{
-    if (rampDurationSeconds != newDurationSeconds)
-    {
-        rampDurationSeconds = newDurationSeconds;
-        reset();
-    }
-}
-
-template <typename SampleType>
-double OrfanidisPeak<SampleType>::getRampDurationSeconds() const noexcept
-{
-    return rampDurationSeconds;
-}
-
-template <typename SampleType>
-bool OrfanidisPeak<SampleType>::isSmoothing() const noexcept
-{
-    bool isSmoothing = frq.isSmoothing() || res.isSmoothing() || lev.isSmoothing();
-
-    return isSmoothing;
-}
-
-//==============================================================================
-template <typename SampleType>
 void OrfanidisPeak<SampleType>::prepare(juce::dsp::ProcessSpec& spec)
 {
     jassert(spec.sampleRate > 0);
