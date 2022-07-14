@@ -52,13 +52,9 @@ void OrfanidisPeak<SampleType>::setFrequency(SampleType newFreq)
 template <typename SampleType>
 void OrfanidisPeak<SampleType>::setResonance(SampleType newRes)
 {
-    //jassert(zero <= newRes && newRes <= one);
-
-    if (res.getTargetValue() != newRes)
+    if (res != juce::jlimit(SampleType(0.1), SampleType(1.0), newRes))
     {
-        res.setTargetValue(juce::jlimit(SampleType(0.0), SampleType(1.0), newRes));
-
-        radSampBandwidth = radSampFrequency / (SampleType(1.588308819) * q);
+        res = one / newRes;
 
         coefficients();
     }
