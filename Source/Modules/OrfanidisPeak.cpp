@@ -260,8 +260,6 @@ void OrfanidisPeak<SampleType>::coefficients()
     b[0] = (b_[0] * a[0]);
     b[1] = (b_[1] * a[0]);
     b[2] = (b_[2] * a[0]);
-
-    
 }
 
 template <typename SampleType>

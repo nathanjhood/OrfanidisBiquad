@@ -35,11 +35,11 @@ class OrfanidisPeak
 {
 public:
     using transformationType = TransformationType;
-    //==============================================================================
+    //==========================================================================
     /** Constructor. */
     OrfanidisPeak();
 
-    //==============================================================================
+    //==========================================================================
     /** Sets the centre Frequency of the filter. Range = 20..20000 */
     void setFrequency(SampleType newFreq);
 
@@ -52,7 +52,7 @@ public:
     /** Sets the BiLinear Transform for the filter to use. See enum for available types. */
     void setTransformType(transformationType newTransformType);
 
-    //==============================================================================
+    //==========================================================================
     /** Initialises the processor. */
     void prepare(juce::dsp::ProcessSpec& spec);
 
@@ -64,7 +64,7 @@ public:
     by sample processing.*/
     void snapToZero() noexcept;
 
-    //==============================================================================
+    //==========================================================================
     /** Processes the input and output samples supplied in the processing context. */
     template <typename ProcessContext>
     void process(const ProcessContext& context) noexcept
@@ -97,16 +97,16 @@ public:
 #endif
     }
 
-    //==============================================================================
+    //==========================================================================
     /** Processes one sample at a time on a given channel. */
     SampleType processSample(int channel, SampleType inputValue);
 
 private:
-    //==============================================================================
+    //==========================================================================
     void coefficients();
-
     void calcs();
 
+    //==========================================================================
     SampleType directFormI(int channel, SampleType inputValue);
     SampleType directFormII(int channel, SampleType inputValue);
     SampleType directFormITransposed(int channel, SampleType inputValue);
@@ -114,12 +114,12 @@ private:
 
     //==========================================================================
     /** Coefficient current value. Safe to pass i.e. to the display thread */
-    /*SampleType geta0() { return a[0]; }
+    SampleType geta0() { return a[0]; }
     SampleType getb0() { return b[0]; }
     SampleType geta1() { return a[1]; }
     SampleType getb1() { return b[1]; }
     SampleType geta2() { return a[2]; }
-    SampleType getb2() { return b[2]; }*/
+    SampleType getb2() { return b[2]; }
 
     //==============================================================================
     /** Unit-delay objects. */
@@ -127,10 +127,12 @@ private:
 
     //==========================================================================
     /** Coefficient gain */
-    Coefficient<SampleType> a[3] = { 1.0, 0.0, 0.0 }, b[3] = { 1.0, 0.0, 0.0 };
+    Coefficient<SampleType> a[3], b[3];
 
     /** Coefficient calculation */
-    SampleType a_[3] = { 1.0, 0.0, 0.0 }, b_[3] = { 1.0, 0.0, 0.0 };
+    SampleType a_[3];
+    SampleType b_[3];
+
     Coefficient<SampleType> G0, G, GB, w0, Dw;
 
     //==========================================================================
