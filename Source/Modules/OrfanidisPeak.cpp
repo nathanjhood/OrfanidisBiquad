@@ -108,10 +108,6 @@ void OrfanidisPeak<SampleType>::prepare(juce::dsp::ProcessSpec& spec)
 
     reset();
 
-    setFrequency(hz);
-    setResonance(q);
-    setGain(g);
-
     coefficients();
 }
 
