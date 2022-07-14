@@ -41,12 +41,9 @@ void OrfanidisPeak<SampleType>::setFrequency(SampleType newFreq)
 {
     jassert(minFreq <= newFreq && newFreq <= maxFreq);
 
-    if (frq.getTargetValue() != newFreq)
+    if (frq != juce::jlimit(minFreq, maxFreq, newFreq))
     {
-        frq.setTargetValue(juce::jlimit(minFreq, maxFreq, newFreq));
-
-        hzFrequency = frq.getNextValue();
-        radSampFrequency = static_cast <SampleType>(hzFrequency * ((two * pi) / sampleRate));
+        frq = newFreq;
         
         coefficients();
     }
