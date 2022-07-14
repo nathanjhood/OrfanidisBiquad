@@ -53,16 +53,6 @@ public:
     void setTransformType(transformationType newTransformType);
 
     //==============================================================================
-    /** Sets the length of the ramp used for smoothing parameter changes. */
-    void setRampDurationSeconds(double newDurationSeconds) noexcept;
-
-    /** Returns the ramp duration in seconds. */
-    double getRampDurationSeconds() const noexcept;
-
-    /** Returns true if the current value is currently being interpolated. */
-    bool isSmoothing() const noexcept;
-
-    //==============================================================================
     /** Initialises the processor. */
     void prepare(juce::dsp::ProcessSpec& spec);
 
@@ -83,17 +73,12 @@ public:
         auto& outputBlock = context.getOutputBlock();
         const auto numChannels = outputBlock.getNumChannels();
         const auto numSamples = outputBlock.getNumSamples();
-        const auto len = inputBlock.getNumSamples();
 
         jassert(inputBlock.getNumChannels() == numChannels);
         jassert(inputBlock.getNumSamples() == numSamples);
 
         if (context.isBypassed)
         {
-            frq.skip(static_cast<int> (len));
-            res.skip(static_cast<int> (len));
-            lev.skip(static_cast<int> (len));
-
             outputBlock.copyFrom(inputBlock);
             return;
         }
@@ -120,6 +105,8 @@ private:
     //==============================================================================
     void coefficients();
 
+    void calcs();
+
     SampleType directFormI(int channel, SampleType inputValue);
     SampleType directFormII(int channel, SampleType inputValue);
     SampleType directFormITransposed(int channel, SampleType inputValue);
@@ -127,12 +114,12 @@ private:
 
     //==========================================================================
     /** Coefficient current value. Safe to pass i.e. to the display thread */
-    SampleType geta0() { return a0.get(); }
-    SampleType getb0() { return b0.get(); }
-    SampleType geta1() { return a1.get(); }
-    SampleType getb1() { return b1.get(); }
-    SampleType geta2() { return a2.get(); }
-    SampleType getb2() { return b2.get(); }
+    SampleType geta0() { return a[0]; }
+    SampleType getb0() { return b[0]; }
+    SampleType geta1() { return a[1]; }
+    SampleType getb1() { return b[1]; }
+    SampleType geta2() { return a[2]; }
+    SampleType getb2() { return b[2]; }
 
     //==============================================================================
     /** Unit-delay objects. */
@@ -140,26 +127,17 @@ private:
 
     //==========================================================================
     /** Coefficient gain */
-    Coefficient<SampleType> b0, b1, b2, a0, a1, a2;
+    Coefficient<SampleType> a[3], b[3];
 
     /** Coefficient calculation */
-    Coefficient<SampleType> b_0, b_1, b_2, a_0, a_1, a_2;
-
+    SampleType a_[3], b_[3];
     Coefficient<SampleType> G0, G, GB, w0, Dw;
-
-    //==============================================================================
-    /** Parameter Smoothers. */
-    juce::SmoothedValue<SampleType, juce::ValueSmoothingTypes::Multiplicative> frq;
-    juce::SmoothedValue<SampleType, juce::ValueSmoothingTypes::Linear> res;
-    juce::SmoothedValue<SampleType, juce::ValueSmoothingTypes::Linear> lev;
 
     //==========================================================================
     /** Initialised parameter */
-    SampleType loop = 0.0, outputSample = 0.0;
-    SampleType minFreq = 20.0, maxFreq = 20000.0, hz = 1000.0, q = 0.5, g = 0.0;
-    transformationType transformType = transformationType::directFormIItransposed;
-
-    SampleType gainLin, bandwidthGain, hzFrequency, radSampFrequency, radSampBandwidth {0.0};
+    SampleType frq, res, gain;
+    SampleType loop, outputSample, omega, minFreq, maxFreq;
+    transformationType transformType;
 
     //==========================================================================
     /** Initialised constant */
@@ -167,6 +145,17 @@ private:
     const SampleType pi = juce::MathConstants<SampleType>::pi;
     const SampleType root2 = juce::MathConstants<SampleType>::sqrt2;
     double sampleRate = 44100.0, rampDurationSeconds = 0.00005;
+
+    SampleType F, D, C, B, A, G1, W2, DW;
+    SampleType F00, F01, F11;
+    SampleType G00, G01, G11;
+    SampleType G0G1, G0W2;
+    SampleType omegaPiTwo, onePlusW2A;
+    SampleType num, den;
+
+    SampleType Gsq, GsqX, GsqD;
+    SampleType Fsq, FsqX, FsqD;
+
     //==============================================================================
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OrfanidisPeak)
