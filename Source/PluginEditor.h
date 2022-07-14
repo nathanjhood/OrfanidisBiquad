@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Components/AutoComponent.h"
 #include "Components/AutoMeter.h"
@@ -19,7 +19,6 @@
 class OrfanidisBiquadAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
-    using APVTS = juce::AudioProcessorValueTreeState;
     //==========================================================================
     OrfanidisBiquadAudioProcessorEditor (OrfanidisBiquadAudioProcessor& p);
     ~OrfanidisBiquadAudioProcessorEditor() override;
@@ -33,7 +32,7 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     OrfanidisBiquadAudioProcessor& audioProcessor;
-    APVTS& state;
+    juce::AudioProcessorValueTreeState& state;
     juce::UndoManager& undoManager;
 
     AutoMeter meterLeft, meterRight;

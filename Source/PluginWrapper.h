@@ -22,8 +22,8 @@ template <typename SampleType>
 class ProcessWrapper
 {
 public:
-    using APVTS = juce::AudioProcessorValueTreeState;
-    using Spec = juce::dsp::ProcessSpec;
+    //using APVTS = juce::AudioProcessorValueTreeState;
+    //using Spec = juce::dsp::ProcessSpec;
     //==============================================================================
     /** Constructor. */
     ProcessWrapper(OrfanidisBiquadAudioProcessor& p);
@@ -47,7 +47,7 @@ private:
     // This reference is provided as a quick way for the wrapper to
     // access the processor object that created it.
     OrfanidisBiquadAudioProcessor& audioProcessor;
-    APVTS& state;
+    juce::AudioProcessorValueTreeState& state;
     juce::dsp::ProcessSpec& setup;
 
     //==============================================================================

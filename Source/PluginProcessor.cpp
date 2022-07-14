@@ -21,8 +21,8 @@ OrfanidisBiquadAudioProcessor::OrfanidisBiquadAudioProcessor()
     parameters(*this),
     processorFloat(*this),
     processorDouble(*this),
-    bypassState(dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter("bypassID"))),
-    processingPrecision(singlePrecision)
+    bypassState(static_cast<juce::AudioParameterBool*>(apvts.getParameter("bypassID"))),
+    processingPrecision(ProcessingPrecision::singlePrecision)
 {
     jassert(bypassState != nullptr);
 }
@@ -225,7 +225,7 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
         rmsRight.skip(buffer.getNumSamples());
 
         {
-            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+            const auto value = static_cast<float>(juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples())));
             if (value < rmsLeft.getCurrentValue())
                 rmsLeft.setTargetValue(value);
             else
@@ -233,7 +233,7 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
         }
 
         {
-            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+            const auto value = static_cast<float>(juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples())));
             if (value < rmsRight.getCurrentValue())
                 rmsRight.setTargetValue(value);
             else
@@ -281,7 +281,7 @@ juce::AudioProcessorEditor* OrfanidisBiquadAudioProcessor::createEditor()
 
 juce::AudioProcessorValueTreeState::ParameterLayout OrfanidisBiquadAudioProcessor::createParameterLayout()
 {
-    APVTS::ParameterLayout params;
+    juce::AudioProcessorValueTreeState::ParameterLayout params;
 
     params.add(std::make_unique<juce::AudioParameterBool>("bypassID", "Bypass", false));
 

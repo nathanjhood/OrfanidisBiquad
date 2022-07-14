@@ -19,8 +19,6 @@
 class OrfanidisBiquadAudioProcessor : public juce::AudioProcessor
 {
 public:
-    using APVTS = juce::AudioProcessorValueTreeState;
-    using Spec = juce::dsp::ProcessSpec;
     using precisionType = ProcessingPrecision;
     //==============================================================================
     OrfanidisBiquadAudioProcessor();
@@ -79,14 +77,14 @@ public:
 
     //==========================================================================
     /** Audio processor value tree. */
-    APVTS apvts;
-    APVTS& getAPVTS() { return apvts; };
-    static APVTS::ParameterLayout createParameterLayout();
+    juce::AudioProcessorValueTreeState apvts;
+    juce::AudioProcessorValueTreeState& getAPVTS() { return apvts; };
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     //==========================================================================
     /** Audio processor specs. */
-    Spec spec;
-    Spec& getSpec() { return spec; };
+    juce::dsp::ProcessSpec spec;
+    juce::dsp::ProcessSpec& getSpec() { return spec; };
 
     float getRMSLevel(const int channel) const;
 

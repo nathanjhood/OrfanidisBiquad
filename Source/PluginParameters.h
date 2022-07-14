@@ -20,7 +20,7 @@ class OrfanidisBiquadAudioProcessor;
 class Parameters
 {
 public:
-    using APVTS = juce::AudioProcessorValueTreeState;
+    //using APVTS = juce::AudioProcessorValueTreeState;
     using Params = juce::AudioProcessorValueTreeState::ParameterLayout;
     //==========================================================================
     /** Constructor. */
@@ -35,7 +35,7 @@ private:
     // This reference is provided as a quick way for the wrapper to
     // access the processor object that created it.
     OrfanidisBiquadAudioProcessor& audioProcessor;
-    APVTS& state;
+    juce::AudioProcessorValueTreeState& state;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameters)
 };
