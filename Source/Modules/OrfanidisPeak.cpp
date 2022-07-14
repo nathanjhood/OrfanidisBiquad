@@ -20,9 +20,17 @@
 template <typename SampleType>
 OrfanidisPeak<SampleType>::OrfanidisPeak() 
     :
-    b0(one), b1(zero), b2(zero), a0(one), a1(zero), a2(zero),
-    b_0(one), b_1(zero), b_2(zero), a_0(one), a_1(zero), a_2(zero),
-    G0(zero), G(zero), GB(zero), w0(zero), Dw(zero)
+    G0(one), G(zero), GB(zero), w0(zero), Dw(zero),
+    frq(minFreq), res(one), gain(zero),
+    loop(zero), outputSample(zero), omega(zero), 
+    minFreq((SampleType)20.0), maxFreq((SampleType)20000.0),
+    transformType(TransformationType::directFormIItransposed),
+    F(zero), D(zero), C(zero), B(zero), A(zero), G1(zero), W2(zero), DW(zero),
+    F00(zero), F01(zero), F11(zero), G00(zero), G01(zero), G11(zero), 
+    G0G1(zero),
+    G0W2(zero),
+    omegaPiTwo(zero), onePlusW2A(zero), num(zero), den(zero),
+    Gsq(zero), GsqX(zero), GsqD(zero), Fsq(zero), FsqX(zero), FsqD(zero)
 {
     reset();
 }
