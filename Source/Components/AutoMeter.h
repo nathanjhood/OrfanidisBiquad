@@ -35,8 +35,8 @@ public:
         g.fillRoundedRectangle(bounds, 5.0f);
 
         g.setColour(juce::Colours::white);
-        const auto scaledX = juce::jmap(level, -60.0f, +6.0f, 0.0f, static_cast<float>(getWidth()));
-        g.fillRoundedRectangle(bounds.removeFromLeft(scaledX), 5.0f);
+        const auto scaledY = juce::jmap(level, -60.0f, +6.0f, 0.0f, static_cast<float>(getHeight()));
+        g.fillRoundedRectangle(bounds.removeFromBottom(scaledY), 5.0f);
     }
 
 
