@@ -234,60 +234,95 @@ template <typename SampleType>
 void OrfanidisPeak<SampleType>::coefficients()
 {
     G0 = one;
-    G = gainLin;
-    GB = bandwidthGain;
-    w0 = radSampFrequency;
-    Dw = radSampBandwidth;
+    G = juce::Decibels::decibelsToGain(gain); // Linear gain
+    GB = juce::Decibels::decibelsToGain(gain / root2); //Bandwidth gain
+    w0 = frq * omega; // RadSampFreq
+    Dw = (frq * omega) / (SampleType(1.588308819) * res); //RadSampBW
 
     if (G == GB)    // if no boost or cut, pass audio
     {
-        b_0 = one;
-        b_1 = zero;
-        b_2 = zero;
-        a_0 = one;
-        a_1 = zero;
-        a_2 = zero;
+        a_[0] = one;
+        a_[1] = zero;
+        a_[2] = zero;
+        b_[0] = one;
+        b_[1] = zero;
+        b_[2] = zero;
     }
 
     else            // else calculate coefficients
     {
-        const SampleType F = std::abs(G * G - GB * GB);
-        const SampleType G00 = std::abs(G * G - G0 * G0);
-        const SampleType F00 = std::abs(GB * GB - G0 * G0);
+        calcs();
 
-        const SampleType num = G0 * G0 * std::pow(w0 * w0 - pi * pi, two) + G * G * F00 * pi * pi * Dw * Dw / F;
-        const SampleType den = std::pow(w0 * w0 - pi * pi, two) + F00 * pi * pi * Dw * Dw / F;
-
-        const SampleType G1 = std::sqrt(num / den);
-
-        const SampleType G01 = std::abs(G * G - G0 * G1);
-        const SampleType G11 = std::abs(G * G - G1 * G1);
-        const SampleType F01 = std::abs(GB * GB - G0 * G1);
-        const SampleType F11 = std::abs(GB * GB - G1 * G1);
-
-        const SampleType W2 = std::sqrt(G11 / G00) * std::pow(std::tan(w0 / two), two);
-        const SampleType DW = (one + std::sqrt(F00 / F11) * W2) * std::tan(Dw / two);
-
-        const SampleType C = F11 * DW * DW - two * W2 * (F01 - std::sqrt(F00 * F11));
-        const SampleType D = two * W2 * (G01 - std::sqrt(G00 * G11));
-
-        const SampleType A = std::sqrt((C + D) / F);
-        const SampleType B = std::sqrt((G * G * C + GB * GB * D) / F);
-
-        b_0 = (G1 + G0 * W2 + B) / (one + W2 + A);
-        b_1 = minusTwo * ((G1 - G0 * W2) / (one + W2 + A));
-        b_2 = (G1 - B + G0 * W2) / (one + W2 + A);
-        a_0 = one;
-        a_1 = minusTwo * ((one - W2) / (one + W2 + A)),
-        a_2 = (one + W2 - A) / (one + W2 + A);
+        a_[0] = one;
+        a_[1] = minusTwo * ((one - G0W2) / onePlusW2A);
+        a_[2] = (one + G0W2 - A) / onePlusW2A;
+        b_[0] = (G1 + G0W2 + B) / onePlusW2A;
+        b_[1] = minusTwo * ((G1 - G0W2) / onePlusW2A);
+        b_[2] = (G1 + G0W2 - B) / onePlusW2A;
     }
 
-    a0 = (one / a_0);
-    a1 = ((-a_1) * a0);
-    a2 = ((-a_2) * a0);
-    b0 = (b_0 * a0);
-    b1 = (b_1 * a0);
-    b2 = (b_2 * a0);
+    a[0] = (one / a_[0]);
+    a[1] = ((-a_[1]) * a[0]);
+    a[2] = ((-a_[2]) * a[0]);
+    b[0] = (b_[0] * a[0]);
+    b[1] = (b_[1] * a[0]);
+    b[2] = (b_[2] * a[0]);
+}
+
+template <typename SampleType>
+void OrfanidisPeak<SampleType>::calcs()
+{
+    auto powTwo = [&] (SampleType x) { return (x * x); };
+
+    const auto& Gpow2 = powTwo(G);
+    const auto& GBpow2 = powTwo(GB);
+    const auto& G0pow2 = powTwo(G0);
+    const auto& piPow2 = powTwo(pi);
+    const auto& w0pow2 = powTwo(w0);
+    const auto& DwPow2 = powTwo(Dw);
+
+    F = std::abs(Gpow2 - GBpow2);
+    G00 = std::abs(Gpow2 - G0pow2);
+    F00 = std::abs(GBpow2 - G0pow2);
+
+    omegaPiTwo = std::pow((w0pow2 - piPow2), two);
+
+    num = G0pow2 * omegaPiTwo + Gpow2 * F00 * piPow2 * DwPow2 / F;
+    den = omegaPiTwo + F00 * piPow2 * DwPow2 / F;
+
+    G1 = std::sqrt(num / den);
+
+    const auto& G1pow2 = powTwo(G1);
+
+    G0G1 = G0 * G1;
+
+    G01 = std::abs(Gpow2 - G0G1);
+    G11 = std::abs(Gpow2 - G1pow2);
+    F01 = std::abs(GBpow2 - G0G1);
+    F11 = std::abs(GBpow2 - G1pow2);
+
+    GsqD = std::sqrt(G11 / G00);
+    GsqX = std::sqrt(G00 * G11);
+    Gsq = G01 - GsqX;
+
+    FsqD = std::sqrt(F00 / F11);
+    FsqX = std::sqrt(F00 * F11);
+    Fsq = F01 - FsqX;
+
+    W2 = GsqD * std::pow(std::tan(w0 / two), two);
+    DW = (one + FsqD * W2) * std::tan(Dw / two);
+
+    const auto& DWpow2 = powTwo(DW);
+
+    G0W2 = G0 * W2;
+
+    C = F11 * DWpow2 - two * W2 * Fsq;
+    D = two * W2 * Gsq;
+
+    A = std::sqrt((C + D) / F);
+    B = std::sqrt(((Gpow2 * C) + (GBpow2 * D)) / F);
+
+    onePlusW2A = one + W2 + A;
 }
 
 template <typename SampleType>
