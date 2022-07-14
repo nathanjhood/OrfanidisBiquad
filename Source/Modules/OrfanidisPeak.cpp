@@ -161,10 +161,12 @@ SampleType OrfanidisPeak<SampleType>::directFormI(int channel, SampleType inputS
     auto& Xn = inputSample;
     auto& Yn = outputSample;
 
-    Yn = ((Xn * b0) + (Xn1 * b1) + (Xn2 * b2) + (Yn1 * a1) + (Yn2 * a2));
+    Yn = ((Xn * b[0]) + (Xn1 * b[1]) + (Xn2 * b[2]) + (Yn1 * a[1]) + (Yn2 * a[2]));
 
-    Xn2 = Xn1, Yn2 = Yn1;
-    Xn1 = Xn, Yn1 = Yn;
+    Xn2 = Xn1; 
+    Yn2 = Yn1;
+    Xn1 = Xn; 
+    Yn1 = Yn;
 
     return Yn;
 }
@@ -179,8 +181,8 @@ SampleType OrfanidisPeak<SampleType>::directFormII(int channel, SampleType input
     auto& Xn = inputSample;
     auto& Yn = outputSample;
 
-    Wn = (Xn + ((Wn1 * a1) + (Wn2 * a2)));
-    Yn = ((Wn * b0) + (Wn1 * b1) + (Wn2 * b2));
+    Wn = (Xn + ((Wn1 * a[1]) + (Wn2 * a[2])));
+    Yn = ((Wn * b[0]) + (Wn1 * b[1]) + (Wn2 * b[2]));
 
     Wn2 = Wn1;
     Wn1 = Wn;
@@ -201,10 +203,12 @@ SampleType OrfanidisPeak<SampleType>::directFormITransposed(int channel, SampleT
     auto& Yn = outputSample;
 
     Wn = (Xn + Wn2);
-    Yn = ((Wn * b0) + Xn2);
+    Yn = ((Wn * b[0]) + Xn2);
 
-    Xn2 = ((Wn * b1) + Xn1), Wn2 = ((Wn * a1) + Wn1);
-    Xn1 = (Wn * b2), Wn1 = (Wn * a2);
+    Xn2 = ((Wn * b[1]) + Xn1); 
+    Wn2 = ((Wn * a[1]) + Wn1);
+    Xn1 = (Wn * b[2]); 
+    Wn1 = (Wn * a[2]);
 
     return Yn;
 }
@@ -218,10 +222,10 @@ SampleType OrfanidisPeak<SampleType>::directFormIITransposed(int channel, Sample
     auto& Xn = inputSample;
     auto& Yn = outputSample;
 
-    Yn = ((Xn * b0) + (Xn2));
+    Yn = ((Xn * b[0]) + (Xn2));
 
-    Xn2 = ((Xn * b1) + (Xn1)+(Yn * a1));
-    Xn1 = ((Xn * b2) + (Yn * a2));
+    Xn2 = ((Xn * b[1]) + (Xn1) + (Yn * a[1]));
+    Xn1 = ((Xn * b[2]) + (Yn * a[2]));
 
     return Yn;
 }
