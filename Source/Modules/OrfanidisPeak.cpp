@@ -120,10 +120,6 @@ void OrfanidisPeak<SampleType>::reset(SampleType initialValue)
 {
     for (auto v : { &Wn_1, &Wn_2, &Xn_1, &Xn_2, &Yn_1, &Yn_2 })
         std::fill(v->begin(), v->end(), initialValue);
-
-    frq.reset(sampleRate, rampDurationSeconds);
-    res.reset(sampleRate, rampDurationSeconds);
-    lev.reset(sampleRate, rampDurationSeconds);
 }
 
 template <typename SampleType>
