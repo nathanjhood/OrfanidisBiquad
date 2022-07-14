@@ -14,7 +14,8 @@
 #define PLUGINWRAPPER_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Modules/OrfanidisPeak.h"
+//#include "Modules/OrfanidisPeak.h"
+#include "Modules/MatchedBiquads.h"
 
 class OrfanidisBiquadAudioProcessor;
 
@@ -22,8 +23,6 @@ template <typename SampleType>
 class ProcessWrapper
 {
 public:
-    //using APVTS = juce::AudioProcessorValueTreeState;
-    //using Spec = juce::dsp::ProcessSpec;
     //==============================================================================
     /** Constructor. */
     ProcessWrapper(OrfanidisBiquadAudioProcessor& p);
@@ -53,7 +52,7 @@ private:
     //==============================================================================
     /** Instantiate objects. */
     juce::dsp::DryWetMixer<SampleType> mixer;
-    OrfanidisPeak<SampleType> filter;
+    MatchedBiquad<SampleType> filter;
     juce::dsp::Gain<SampleType> output;
 
     //==========================================================================
