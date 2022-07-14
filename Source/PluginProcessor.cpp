@@ -225,7 +225,7 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
         rmsRight.skip(buffer.getNumSamples());
 
         {
-            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+            const auto value = static_cast<float>(juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples())));
             if (value < rmsLeft.getCurrentValue())
                 rmsLeft.setTargetValue(value);
             else
@@ -233,7 +233,7 @@ void OrfanidisBiquadAudioProcessor::processBlock(juce::AudioBuffer<double>& buff
         }
 
         {
-            const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+            const auto value = static_cast<float>(juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples())));
             if (value < rmsRight.getCurrentValue())
                 rmsRight.setTargetValue(value);
             else
