@@ -63,12 +63,9 @@ void OrfanidisPeak<SampleType>::setResonance(SampleType newRes)
 template <typename SampleType>
 void OrfanidisPeak<SampleType>::setGain(SampleType newGain)
 {
-    if (lev.getTargetValue() != newGain)
+    if (gain != newGain)
     {
-        lev.setTargetValue(newGain);
-
-        gainLin = juce::Decibels::decibelsToGain(static_cast<SampleType>(lev.getNextValue()));
-        bandwidthGain = juce::Decibels::decibelsToGain(lev.getNextValue() / root2);
+        gain = newGain;
 
         coefficients();
     }
