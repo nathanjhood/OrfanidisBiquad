@@ -114,12 +114,12 @@ private:
 
     //==========================================================================
     /** Coefficient current value. Safe to pass i.e. to the display thread */
-    SampleType geta0() { return a[0]; }
+    /*SampleType geta0() { return a[0]; }
     SampleType getb0() { return b[0]; }
     SampleType geta1() { return a[1]; }
     SampleType getb1() { return b[1]; }
     SampleType geta2() { return a[2]; }
-    SampleType getb2() { return b[2]; }
+    SampleType getb2() { return b[2]; }*/
 
     //==============================================================================
     /** Unit-delay objects. */
@@ -127,10 +127,10 @@ private:
 
     //==========================================================================
     /** Coefficient gain */
-    Coefficient<SampleType> a[3], b[3];
+    Coefficient<SampleType> a[3] = { 1.0, 0.0, 0.0 }, b[3] = { 1.0, 0.0, 0.0 };
 
     /** Coefficient calculation */
-    SampleType a_[3], b_[3];
+    SampleType a_[3] = { 1.0, 0.0, 0.0 }, b_[3] = { 1.0, 0.0, 0.0 };
     Coefficient<SampleType> G0, G, GB, w0, Dw;
 
     //==========================================================================
@@ -139,22 +139,16 @@ private:
     SampleType loop, outputSample, omega, minFreq, maxFreq;
     transformationType transformType;
 
+    SampleType D, C, B, A, G1;
+    SampleType G0W2, onePlusW2A;
+    SampleType num, den;
+
     //==========================================================================
     /** Initialised constant */
     const SampleType zero = 0.0, one = 1.0, two = 2.0, minusOne = -1.0, minusTwo = -2.0;
     const SampleType pi = juce::MathConstants<SampleType>::pi;
     const SampleType root2 = juce::MathConstants<SampleType>::sqrt2;
-    double sampleRate = 44100.0, rampDurationSeconds = 0.00005;
-
-    SampleType F, D, C, B, A, G1, W2, DW;
-    SampleType F00, F01, F11;
-    SampleType G00, G01, G11;
-    SampleType G0G1, G0W2;
-    SampleType omegaPiTwo, onePlusW2A;
-    SampleType num, den;
-
-    SampleType Gsq, GsqX, GsqD;
-    SampleType Fsq, FsqX, FsqD;
+    double sampleRate = 44100.0;
 
     //==============================================================================
 
