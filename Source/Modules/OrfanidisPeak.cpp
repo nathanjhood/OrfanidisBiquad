@@ -333,6 +333,40 @@ void OrfanidisPeak<SampleType>::snapToZero() noexcept
             juce::dsp::util::snapToZero(element);
 }
 
+//template <typename SampleType>
+//void OrfanidisPeak<SampleType>::coefficients()
+//{
+//    const SampleType F = std::abs((G * G) - (GB * GB));
+//    const SampleType G00 = std::abs((G * G) - (G0 * G0));
+//    const SampleType F00 = std::abs((GB * GB) - (G0 * G0));
+//
+//    const SampleType num = G0 * G0 * std::pow(w0 * w0 - pi * pi, two) + G * G * F00 * pi * pi * Dw * Dw / F;
+//    const SampleType den = std::pow(w0 * w0 - pi * pi, two) + F00 * pi * pi * Dw * Dw / F;
+//
+//    const SampleType G1 = std::sqrt(num / den);
+//
+//    const SampleType G01 = std::abs((G * G) - (G0 * G1));
+//    const SampleType G11 = std::abs((G * G) - (G1 * G1));
+//    const SampleType F01 = std::abs((GB * GB) - (G0 * G1));
+//    const SampleType F11 = std::abs((GB * GB) - (G1 * G1));
+//
+//    const SampleType W2 = std::sqrt(G11 / G00) * std::pow(std::tan(w0 / two), two);
+//    const SampleType DW = (one + std::sqrt(F00 / F11) * W2) * std::tan(Dw / two);
+//
+//    const SampleType C = F11 * DW * DW - two * W2 * (F01 - std::sqrt(F00 * F11));
+//    const SampleType D = two * W2 * (G01 - std::sqrt(G00 * G11));
+//
+//    const SampleType A = std::sqrt((C + D) / F);
+//    const SampleType B = std::sqrt((G * G * C + GB * GB * D) / F);
+//
+//    b_0 = (G1 + G0 * W2 + B) / (one + W2 + A);
+//    b_1 = minusTwo * ((G1 - G0 * W2) / (one + W2 + A));
+//    b_2 = (G1 - B + G0 * W2) / (one + W2 + A);
+//    a_0 = one;
+//    a_1 = minusTwo * ((one - W2) / (one + W2 + A));
+//    a_2 = (one + W2 - A) / (one + W2 + A);
+//}
+
 //==============================================================================
 template class OrfanidisPeak<float>;
 template class OrfanidisPeak<double>;
